@@ -1,11 +1,21 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { ProductCatalog } from '@/components/ProductCatalog';
+import { Cart } from '@/components/Cart';
+import { WalletConnect } from '@/components/WalletConnect';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gray-50">
+      <WalletConnect />
+      <div className="container mx-auto py-8">
+        <h1 className="text-4xl font-bold text-center mb-8">Crypto Burger</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <ProductCatalog />
+          </div>
+          <div className="lg:col-span-1">
+            <Cart />
+          </div>
+        </div>
       </div>
     </div>
   );
