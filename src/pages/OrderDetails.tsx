@@ -1,15 +1,23 @@
 import { useCart } from '@/store/useCart';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 export default function OrderDetails() {
-  const { items } = useCart();
+  const { items, applyCoupon, couponCode, discount } = useCart();
   const navigate = useNavigate();
+  const [couponInput, setCouponInput] = useState('');
   
-  const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const discountAmount = discount * subtotal;
+  const total = subtotal - discountAmount;
   const orderId = Math.floor(Math.random() * 100000000);
+
+  const handleApplyCoupon = () => {
+    applyCoupon(couponInput);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -54,6 +62,24 @@ export default function OrderDetails() {
           <div className="flex justify-between items-center text-gray-500">
             <span>Free Delivery</span>
             <span>$0.00</span>
+          </div>
+
+          {/* Coupon Code Section */}
+          <div className="pt-4 border-t">
+            <div className="flex items-center space-x-2">
+              <Input
+                placeholder="Enter coupon code"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value)}
+              />
+              <Button onClick={handleApplyCoupon}>Apply</Button>
+            </div>
+            {couponCode && discount > 0 && (
+              <div className="flex justify-between items-center text-green-600 mt-2">
+                <span>Discount ({couponCode})</span>
+                <span>-${discountAmount.toFixed(2)}</span>
+              </div>
+            )}
           </div>
         </div>
 
