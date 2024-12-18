@@ -8,100 +8,36 @@ import { useNavigate } from 'react-router-dom';
 const PRODUCTS: Product[] = [
   {
     id: '1',
-    name: 'Cake',
-    description: 'Sweet and delicious',
-    price: 1,
+    name: 'Montgolfiere',
+    description: 'Hot air balloon experience',
+    price: 299.99,
     image: '/placeholder.svg',
-    category: 'Desserts',
+    category: 'Experience',
     isNew: true
   },
   {
     id: '2',
-    name: 'Burger',
-    description: 'Classic burger with cheese',
-    price: 4.99,
+    name: 'Rails',
+    description: 'Premium quality rails',
+    price: 149.99,
     image: '/placeholder.svg',
-    category: 'Main'
+    category: 'Equipment'
   },
   {
     id: '3',
-    name: 'Fries',
-    description: 'Crispy golden fries',
-    price: 1.49,
+    name: 'Bois bande Premium',
+    description: 'Premium wood band',
+    price: 79.99,
     image: '/placeholder.svg',
-    category: 'Sides'
+    category: 'Accessories'
   },
   {
     id: '4',
-    name: 'Hotdog',
-    description: 'Classic hotdog',
-    price: 3.49,
+    name: 'Tshirt',
+    description: 'Comfortable cotton t-shirt',
+    price: 24.99,
     image: '/placeholder.svg',
-    category: 'Main'
-  },
-  {
-    id: '5',
-    name: 'Taco',
-    description: 'Mucho más',
-    price: 3.99,
-    image: '/placeholder.svg',
-    category: 'Main'
-  },
-  {
-    id: '6',
-    name: 'Pizza',
-    description: 'Slice of heaven',
-    price: 7.99,
-    image: '/placeholder.svg',
-    category: 'Main'
-  },
-  {
-    id: '7',
-    name: 'Donut',
-    description: 'Hole included',
-    price: 1.49,
-    image: '/placeholder.svg',
-    category: 'Desserts'
-  },
-  {
-    id: '8',
-    name: 'Popcorn',
-    description: 'Lights, camera, corn',
-    price: 1.99,
-    image: '/placeholder.svg',
-    category: 'Snacks'
-  },
-  {
-    id: '9',
-    name: 'Coke',
-    description: 'Ice cold refreshment',
-    price: 1.49,
-    image: '/placeholder.svg',
-    category: 'Drinks'
-  },
-  {
-    id: '10',
-    name: 'Icecream',
-    description: 'Sweet and cold',
-    price: 5.99,
-    image: '/placeholder.svg',
-    category: 'Desserts'
-  },
-  {
-    id: '11',
-    name: 'Cookie',
-    description: 'Freshly baked',
-    price: 3.99,
-    image: '/placeholder.svg',
-    category: 'Desserts'
-  },
-  {
-    id: '12',
-    name: 'Flan',
-    description: 'Classic dessert',
-    price: 7.99,
-    image: '/placeholder.svg',
-    category: 'Desserts'
+    category: 'Apparel'
   }
 ];
 
@@ -128,7 +64,7 @@ export function ProductCatalog() {
         <span className="text-gray-500">mini app</span>
       </div>
       
-      <div className="grid grid-cols-3 gap-4 p-4">
+      <div className="grid grid-cols-2 gap-4 p-4">
         {PRODUCTS.map((product) => {
           const cartItem = items.find(item => item.id === product.id);
           
@@ -138,7 +74,7 @@ export function ProductCatalog() {
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-20 h-20 object-cover"
+                  className="w-32 h-32 object-cover rounded-lg"
                 />
                 {product.isNew && (
                   <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
@@ -152,8 +88,11 @@ export function ProductCatalog() {
                 )}
               </div>
               
-              <span className="text-sm font-medium mt-2">
-                {product.name} · ${product.price.toFixed(2)}
+              <span className="text-sm font-medium mt-2 text-center">
+                {product.name}
+              </span>
+              <span className="text-sm text-gray-600">
+                ${product.price.toFixed(2)}
               </span>
 
               {!cartItem ? (
