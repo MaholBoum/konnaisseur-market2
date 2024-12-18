@@ -3,6 +3,7 @@ import { useCart } from '@/store/useCart';
 import { Button } from '@/components/ui/button';
 import { Plus, Minus } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const PRODUCTS: Product[] = [
   {
@@ -107,6 +108,7 @@ const PRODUCTS: Product[] = [
 export function ProductCatalog() {
   const { items, addItem, updateQuantity } = useCart();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleAddToCart = (product: Product) => {
     const existingItem = items.find(item => item.id === product.id);
@@ -187,7 +189,7 @@ export function ProductCatalog() {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
         <Button 
           className="w-full bg-green-500 hover:bg-green-600 text-white py-6 text-lg"
-          onClick={() => console.log('View Order clicked')}
+          onClick={() => navigate('/order-details')}
         >
           VIEW ORDER
         </Button>
