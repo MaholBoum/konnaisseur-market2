@@ -1,7 +1,7 @@
 import { useCart } from '@/store/useCart';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, MoreVertical } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function OrderDetails() {
@@ -9,73 +9,79 @@ export default function OrderDetails() {
   const navigate = useNavigate();
   
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const orderId = Math.floor(Math.random() * 100000000);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <div className="bg-white p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft className="h-6 w-6 text-purple-500" />
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold">Durger King</h1>
-            <p className="text-gray-500 text-sm">mini app</p>
-          </div>
-        </div>
-        <Button variant="ghost" size="icon">
-          <MoreVertical className="h-6 w-6" />
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white p-4 flex items-center justify-between border-b">
+        <Button 
+          variant="ghost" 
+          className="text-purple-500"
+          onClick={() => navigate(-1)}
+        >
+          Cancel
         </Button>
+        <h1 className="text-xl font-semibold">Checkout (Test)</h1>
+        <div className="w-16"></div>
       </div>
 
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">YOUR ORDER</h2>
-          <Button variant="ghost" className="text-green-500">
-            Edit
-          </Button>
+      <div className="p-4 bg-white rounded-lg shadow-sm m-4">
+        <div className="flex items-start gap-4 border-b pb-4">
+          <img
+            src="/lovable-uploads/80299426-225e-4da8-a7ca-fcc09a931f22.png"
+            alt="Durger King"
+            className="w-20 h-20 rounded-lg"
+          />
+          <div>
+            <h2 className="font-bold text-lg">Order #{orderId}</h2>
+            <p className="text-lg">Perfect lunch from Durger King.</p>
+            <p className="text-gray-500">Durger King</p>
+          </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="py-4 space-y-3">
           {items.map((item) => (
-            <div key={item.id} className="flex items-start gap-4">
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-12 h-12 object-cover"
-              />
-              <div className="flex-1">
-                <div className="flex justify-between">
-                  <h3 className="font-bold">
-                    {item.name} <span className="text-orange-500">{item.quantity}x</span>
-                  </h3>
-                  <span>${(item.price * item.quantity).toFixed(2)}</span>
-                </div>
-                <p className="text-gray-500">{item.description}</p>
+            <div key={item.id} className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-600">
+                  {item.name} x{item.quantity}
+                </span>
               </div>
+              <span>${(item.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}
+          
+          <div className="flex justify-between items-center text-gray-500">
+            <span>Free Delivery</span>
+            <span>$0.00</span>
+          </div>
         </div>
 
-        <div className="mt-8">
-          <Textarea 
-            placeholder="Add comment..."
-            className="w-full mb-2"
-          />
-          <p className="text-gray-500 text-sm">
-            Any special requests, details, final wishes etc.
-          </p>
+        <div className="pt-4 border-t">
+          <div className="flex justify-between items-center">
+            <span className="text-xl font-bold">Total</span>
+            <span className="text-xl font-bold">${total.toFixed(2)}</span>
+          </div>
         </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm m-4">
+        <Button
+          variant="ghost"
+          className="w-full p-4 flex justify-between items-center"
+          onClick={() => console.log('Payment method clicked')}
+        >
+          <span className="text-lg">Payment Method</span>
+          <ChevronRight className="h-5 w-5 text-gray-400" />
+        </Button>
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 p-4">
         <Button 
-          className="w-full bg-green-500 hover:bg-green-600 text-white py-6 text-lg"
+          className="w-full bg-purple-500 hover:bg-purple-600 text-white py-6 text-lg"
+          onClick={() => console.log('Process payment')}
         >
-          PAY ${total.toFixed(2)}
+          Pay ${total.toFixed(2)}
         </Button>
       </div>
     </div>
