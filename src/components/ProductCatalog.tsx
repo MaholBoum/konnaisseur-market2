@@ -60,8 +60,7 @@ export function ProductCatalog() {
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex justify-between items-center px-4">
-        <h1 className="text-2xl font-bold">Durger King</h1>
-        <span className="text-gray-500">mini app</span>
+        <h1 className="text-2xl font-bold">Konnaisseur Market</h1>
       </div>
       
       <div className="grid grid-cols-2 gap-4 p-4">
