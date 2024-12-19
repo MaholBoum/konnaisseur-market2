@@ -29,7 +29,7 @@ export default function OrderDetails() {
         >
           Cancel
         </Button>
-        <h1 className="text-xl font-semibold">Checkout (Test)</h1>
+        <h1 className="text-xl font-semibold">Checkout</h1>
         <div className="w-16"></div>
       </div>
 
@@ -37,13 +37,13 @@ export default function OrderDetails() {
         <div className="flex items-start gap-4 border-b pb-4">
           <img
             src="/lovable-uploads/80299426-225e-4da8-a7ca-fcc09a931f22.png"
-            alt="Durger King"
+            alt="Konnaisseur Market"
             className="w-20 h-20 rounded-lg"
           />
           <div>
             <h2 className="font-bold text-lg">Order #{orderId}</h2>
             <p className="text-lg">Perfect lunch from Durger King.</p>
-            <p className="text-gray-500">Durger King</p>
+            <p className="text-gray-500">Konnaisseur Market</p>
           </div>
         </div>
 
@@ -97,7 +97,7 @@ export default function OrderDetails() {
           className="w-full p-4 flex justify-between items-center"
           onClick={() => console.log('Payment method clicked')}
         >
-          <span className="text-lg">Payment Method</span>
+          <span className="text-lg">We receive only USDT TRC-20</span>
           <ChevronRight className="h-5 w-5 text-gray-400" />
         </Button>
       </div>
