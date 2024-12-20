@@ -11,7 +11,7 @@ const PRODUCTS: Product[] = [
     name: 'Montgolfiere',
     description: 'Hot air balloon experience',
     price: 299.99,
-    image: '/placeholder.svg',
+    image: '🎈',
     category: 'Experience',
     isNew: true
   },
@@ -20,7 +20,7 @@ const PRODUCTS: Product[] = [
     name: 'Rails',
     description: 'Premium quality rails',
     price: 149.99,
-    image: '/placeholder.svg',
+    image: '🎈',
     category: 'Equipment'
   },
   {
@@ -28,7 +28,7 @@ const PRODUCTS: Product[] = [
     name: 'Bois bande Premium',
     description: 'Premium wood band',
     price: 79.99,
-    image: '/placeholder.svg',
+    image: '🎈',
     category: 'Accessories'
   },
   {
@@ -36,7 +36,7 @@ const PRODUCTS: Product[] = [
     name: 'Tshirt',
     description: 'Comfortable cotton t-shirt',
     price: 24.99,
-    image: '/placeholder.svg',
+    image: '🎈',
     category: 'Apparel'
   }
 ];
@@ -70,11 +70,9 @@ export function ProductCatalog() {
           return (
             <div key={product.id} className="flex flex-col items-center">
               <div className="relative">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-32 h-32 object-cover rounded-lg"
-                />
+                <div className="w-32 h-32 flex items-center justify-center text-6xl bg-gray-100 rounded-lg">
+                  {product.image}
+                </div>
                 {product.isNew && (
                   <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
                     NEW
