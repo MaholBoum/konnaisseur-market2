@@ -20,7 +20,7 @@ const PRODUCTS: Product[] = [
     name: 'Rails',
     description: 'Premium quality rails',
     price: 149.99,
-    image: '🎈',
+    image: '🛤️',
     category: 'Equipment'
   },
   {
@@ -28,7 +28,7 @@ const PRODUCTS: Product[] = [
     name: 'Bois bande Premium',
     description: 'Premium wood band',
     price: 79.99,
-    image: '🎈',
+    image: '🪵',
     category: 'Accessories'
   },
   {
@@ -36,7 +36,7 @@ const PRODUCTS: Product[] = [
     name: 'Tshirt',
     description: 'Comfortable cotton t-shirt',
     price: 24.99,
-    image: '🎈',
+    image: '👕',
     category: 'Apparel'
   }
 ];
