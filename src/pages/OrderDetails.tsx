@@ -4,11 +4,14 @@ import { Input } from '@/components/ui/input';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function OrderDetails() {
-  const { items, applyCoupon, couponCode, discount } = useCart();
+  const { items, applyCoupon, couponCode, discount, clearCart } = useCart();
   const navigate = useNavigate();
   const [couponInput, setCouponInput] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
   
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const discountAmount = discount * subtotal;
@@ -19,6 +22,66 @@ export default function OrderDetails() {
     applyCoupon(couponInput);
   };
 
+  const processPayment = async () => {
+    if (!window.ethereum) {
+      toast({
+        title: "Error",
+        description: "Please install MetaMask to make payments",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      
+      if (!accounts || accounts.length === 0) {
+        toast({
+          title: "Error",
+          description: "Please connect your wallet first",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const fromAddress = accounts[0];
+      const amountInWei = `0x${(total * 1e18).toString(16)}`; // Convert total to Wei
+
+      // Request payment transaction
+      const txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          from: fromAddress,
+          to: '0xYourMerchantAddress', // Replace with your merchant address
+          value: amountInWei,
+          gas: '0x5208', // 21000 gas
+        }],
+      });
+
+      console.log('Transaction hash:', txHash);
+      
+      toast({
+        title: "Success",
+        description: "Payment processed successfully!",
+      });
+
+      // Clear cart and redirect
+      clearCart();
+      navigate('/');
+      
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Error",
+        description: "Payment failed. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white p-4 flex items-center justify-between border-b">
@@ -27,7 +90,8 @@ export default function OrderDetails() {
           className="text-purple-500"
           onClick={() => navigate(-1)}
         >
-          Cancel
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          Back
         </Button>
         <h1 className="text-xl font-semibold">Checkout</h1>
         <div className="w-16"></div>
@@ -60,8 +124,8 @@ export default function OrderDetails() {
           ))}
           
           <div className="flex justify-between items-center text-gray-500">
-            <span>Free Delivery</span>
-            <span>$0.00</span>
+            <span>Network Fee (Gas)</span>
+            <span>~$0.50</span>
           </div>
 
           {/* Coupon Code Section */}
@@ -95,9 +159,8 @@ export default function OrderDetails() {
         <Button
           variant="ghost"
           className="w-full p-4 flex justify-between items-center"
-          onClick={() => console.log('Payment method clicked')}
         >
-          <span className="text-lg">We receive only USDT TRC-20</span>
+          <span className="text-lg">Pay with connected wallet</span>
           <ChevronRight className="h-5 w-5 text-gray-400" />
         </Button>
       </div>
@@ -105,9 +168,10 @@ export default function OrderDetails() {
       <div className="fixed bottom-0 left-0 right-0 p-4">
         <Button 
           className="w-full bg-purple-500 hover:bg-purple-600 text-white py-6 text-lg"
-          onClick={() => console.log('Process payment')}
+          onClick={processPayment}
+          disabled={isProcessing || items.length === 0}
         >
-          Pay ${total.toFixed(2)}
+          {isProcessing ? 'Processing...' : `Pay ${total.toFixed(2)} ETH`}
         </Button>
       </div>
     </div>
