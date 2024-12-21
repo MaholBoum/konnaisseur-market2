@@ -42,11 +42,18 @@ export const useCart = create<CartStore>((set, get) => ({
   },
 
   updateQuantity: (productId: string, quantity: number) => {
-    set((state) => ({
-      items: state.items.map((item) =>
-        item.id === productId ? { ...item, quantity } : item
-      ),
-    }));
+    set((state) => {
+      if (quantity === 0) {
+        return {
+          items: state.items.filter((item) => item.id !== productId),
+        };
+      }
+      return {
+        items: state.items.map((item) =>
+          item.id === productId ? { ...item, quantity } : item
+        ),
+      };
+    });
   },
 
   applyCoupon: (code: string) => {

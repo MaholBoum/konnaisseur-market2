@@ -3,10 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Minus, Plus, X } from 'lucide-react';
 import { useState } from 'react';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 export function Cart() {
-  const { items, removeItem, updateQuantity, applyCoupon, couponCode, discount } = useCart();
+  const { items, removeItem, updateQuantity, applyCoupon, couponCode, discount, clearCart } = useCart();
   const [couponInput, setCouponInput] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const discountAmount = discount * subtotal;
@@ -14,6 +20,72 @@ export function Cart() {
 
   const handleApplyCoupon = () => {
     applyCoupon(couponInput);
+  };
+
+  const createOrder = async () => {
+    try {
+      setIsProcessing(true);
+      console.log('Creating order with items:', items);
+
+      // Create the order
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          total_amount: subtotal,
+          discount_amount: discountAmount,
+          final_amount: total,
+          coupon_code: couponCode,
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (orderError) {
+        console.error('Error creating order:', orderError);
+        throw orderError;
+      }
+
+      console.log('Order created:', order);
+
+      // Create order items
+      const orderItems = items.map(item => ({
+        order_id: order.id,
+        product_id: item.id,
+        quantity: item.quantity,
+        unit_price: item.price,
+        total_price: item.price * item.quantity
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) {
+        console.error('Error creating order items:', itemsError);
+        throw itemsError;
+      }
+
+      console.log('Order items created successfully');
+      
+      // Clear the cart and show success message
+      clearCart();
+      toast({
+        title: "Order placed successfully!",
+        description: "Your order has been created and is being processed.",
+      });
+      
+      // Navigate to order details
+      navigate('/order-details');
+    } catch (error) {
+      console.error('Error processing order:', error);
+      toast({
+        title: "Error creating order",
+        description: "There was a problem creating your order. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -88,6 +160,14 @@ export function Cart() {
                 <span>{total.toFixed(4)} ETH</span>
               </div>
             </div>
+
+            <Button 
+              className="w-full"
+              onClick={createOrder}
+              disabled={isProcessing || items.length === 0}
+            >
+              {isProcessing ? 'Processing...' : 'Place Order'}
+            </Button>
           </div>
         </>
       )}
