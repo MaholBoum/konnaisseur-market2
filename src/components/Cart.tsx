@@ -11,6 +11,7 @@ export function Cart() {
   const { items, removeItem, updateQuantity, applyCoupon, couponCode, discount, clearCart } = useCart();
   const [couponInput, setCouponInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -18,8 +19,27 @@ export function Cart() {
   const discountAmount = discount * subtotal;
   const total = subtotal - discountAmount;
 
-  const handleApplyCoupon = () => {
-    applyCoupon(couponInput);
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a coupon code",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    try {
+      const result = await applyCoupon(couponInput.trim());
+      toast({
+        title: result.success ? "Success" : "Error",
+        description: result.message,
+        variant: result.success ? "default" : "destructive",
+      });
+    } finally {
+      setIsApplyingCoupon(false);
+    }
   };
 
   const createOrder = async () => {
@@ -140,8 +160,14 @@ export function Cart() {
                 placeholder="Enter coupon code"
                 value={couponInput}
                 onChange={(e) => setCouponInput(e.target.value)}
+                disabled={isApplyingCoupon}
               />
-              <Button onClick={handleApplyCoupon}>Apply</Button>
+              <Button 
+                onClick={handleApplyCoupon}
+                disabled={isApplyingCoupon}
+              >
+                {isApplyingCoupon ? 'Applying...' : 'Apply'}
+              </Button>
             </div>
 
             <div className="space-y-2">

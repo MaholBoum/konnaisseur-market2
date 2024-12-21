@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { CartItem, Product } from '@/types/product';
+import { supabase } from "@/integrations/supabase/client";
 
 interface CartStore {
   items: CartItem[];
@@ -8,7 +9,7 @@ interface CartStore {
   addItem: (product: Product) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
-  applyCoupon: (code: string) => void;
+  applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
   clearCart: () => void;
   total: number;
 }
@@ -56,10 +57,43 @@ export const useCart = create<CartStore>((set, get) => ({
     });
   },
 
-  applyCoupon: (code: string) => {
-    // Simple coupon logic - in real app would validate against backend
-    if (code === "FIRST10") {
-      set({ couponCode: code, discount: 0.1 }); // 10% discount
+  applyCoupon: async (code: string) => {
+    try {
+      console.log('Validating coupon:', code);
+      
+      const { data: coupon, error } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', code)
+        .eq('is_active', true)
+        .single();
+
+      if (error) {
+        console.error('Error fetching coupon:', error);
+        return { success: false, message: 'Invalid coupon code' };
+      }
+
+      if (!coupon) {
+        return { success: false, message: 'Coupon not found' };
+      }
+
+      const now = new Date();
+      if (coupon.expires_at && new Date(coupon.expires_at) < now) {
+        return { success: false, message: 'Coupon has expired' };
+      }
+
+      set({ 
+        couponCode: code, 
+        discount: coupon.discount_percentage / 100 
+      });
+      
+      return { 
+        success: true, 
+        message: `Coupon applied! ${coupon.discount_percentage}% discount` 
+      };
+    } catch (error) {
+      console.error('Error applying coupon:', error);
+      return { success: false, message: 'Error applying coupon' };
     }
   },
 
