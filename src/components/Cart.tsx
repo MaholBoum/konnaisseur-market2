@@ -1,11 +1,12 @@
 import { useCart } from '@/store/useCart';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Minus, Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { CartItem } from './cart/CartItem';
+import { CartSummary } from './cart/CartSummary';
+import { CouponForm } from './cart/CouponForm';
 
 export function Cart() {
   const { items, removeItem, updateQuantity, applyCoupon, couponCode, discount, clearCart } = useCart();
@@ -47,7 +48,6 @@ export function Cart() {
       setIsProcessing(true);
       console.log('Creating order with items:', items);
 
-      // Create the order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -60,14 +60,8 @@ export function Cart() {
         .select()
         .single();
 
-      if (orderError) {
-        console.error('Error creating order:', orderError);
-        throw orderError;
-      }
+      if (orderError) throw orderError;
 
-      console.log('Order created:', order);
-
-      // Create order items
       const orderItems = items.map(item => ({
         order_id: order.id,
         product_id: item.id,
@@ -80,21 +74,14 @@ export function Cart() {
         .from('order_items')
         .insert(orderItems);
 
-      if (itemsError) {
-        console.error('Error creating order items:', itemsError);
-        throw itemsError;
-      }
-
-      console.log('Order items created successfully');
+      if (itemsError) throw itemsError;
       
-      // Clear the cart and show success message
       clearCart();
       toast({
         title: "Order placed successfully!",
         description: "Your order has been created and is being processed.",
       });
       
-      // Navigate to order details
       navigate('/order-details');
     } catch (error) {
       console.error('Error processing order:', error);
@@ -117,75 +104,29 @@ export function Cart() {
       ) : (
         <>
           {items.map((item) => (
-            <div key={item.id} className="flex items-center py-4 border-b">
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-16 h-16 object-cover rounded"
-              />
-              <div className="ml-4 flex-1">
-                <h3 className="font-semibold">{item.name}</h3>
-                <p className="text-sm text-gray-600">{item.price} ETH</p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => updateQuantity(item.id, Math.max(0, item.quantity - 1))}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-8 text-center">{item.quantity}</span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeItem(item.id)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <CartItem
+              key={item.id}
+              item={item}
+              onUpdateQuantity={updateQuantity}
+              onRemoveItem={removeItem}
+            />
           ))}
 
           <div className="mt-6 space-y-4">
-            <div className="flex items-center space-x-2">
-              <Input
-                placeholder="Enter coupon code"
-                value={couponInput}
-                onChange={(e) => setCouponInput(e.target.value)}
-                disabled={isApplyingCoupon}
-              />
-              <Button 
-                onClick={handleApplyCoupon}
-                disabled={isApplyingCoupon}
-              >
-                {isApplyingCoupon ? 'Applying...' : 'Apply'}
-              </Button>
-            </div>
+            <CouponForm
+              couponInput={couponInput}
+              isApplyingCoupon={isApplyingCoupon}
+              onCouponInputChange={setCouponInput}
+              onApplyCoupon={handleApplyCoupon}
+            />
 
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>{subtotal.toFixed(4)} ETH</span>
-              </div>
-              {discount > 0 && (
-                <div className="flex justify-between text-green-600">
-                  <span>Discount ({couponCode})</span>
-                  <span>-{discountAmount.toFixed(4)} ETH</span>
-                </div>
-              )}
-              <div className="flex justify-between font-bold">
-                <span>Total</span>
-                <span>{total.toFixed(4)} ETH</span>
-              </div>
-            </div>
+            <CartSummary
+              subtotal={subtotal}
+              discount={discount}
+              discountAmount={discountAmount}
+              total={total}
+              couponCode={couponCode}
+            />
 
             <Button 
               className="w-full"
