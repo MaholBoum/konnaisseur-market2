@@ -4,47 +4,34 @@ import { Button } from '@/components/ui/button';
 import { Plus, Minus } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from '@tanstack/react-query';
 
-const PRODUCTS: Product[] = [
-  {
-    id: '1',
-    name: 'Montgolfiere',
-    description: 'Hot air balloon experience',
-    price: 299.99,
-    image: '🎈',
-    category: 'Experience',
-    isNew: true
-  },
-  {
-    id: '2',
-    name: 'Rails',
-    description: 'Premium quality rails',
-    price: 149.99,
-    image: '🛤️',
-    category: 'Equipment'
-  },
-  {
-    id: '3',
-    name: 'Bois bande Premium',
-    description: 'Premium wood band',
-    price: 79.99,
-    image: '🪵',
-    category: 'Accessories'
-  },
-  {
-    id: '4',
-    name: 'Tshirt',
-    description: 'Comfortable cotton t-shirt',
-    price: 24.99,
-    image: '👕',
-    category: 'Apparel'
+async function fetchProducts() {
+  console.log('Fetching products from Supabase...');
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching products:', error);
+    throw error;
   }
-];
+  
+  console.log('Products fetched successfully:', data);
+  return data;
+}
 
 export function ProductCatalog() {
   const { items, addItem, updateQuantity } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const { data: products, isLoading, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: fetchProducts,
+  });
 
   const handleAddToCart = (product: Product) => {
     const existingItem = items.find(item => item.id === product.id);
@@ -57,6 +44,22 @@ export function ProductCatalog() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen text-red-500">
+        Error loading products. Please try again later.
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex justify-between items-center px-4">
@@ -64,7 +67,7 @@ export function ProductCatalog() {
       </div>
       
       <div className="grid grid-cols-2 gap-4 p-4">
-        {PRODUCTS.map((product) => {
+        {products?.map((product) => {
           const cartItem = items.find(item => item.id === product.id);
           
           return (
@@ -73,7 +76,7 @@ export function ProductCatalog() {
                 <div className="w-32 h-32 flex items-center justify-center text-6xl bg-gray-100 rounded-lg">
                   {product.image}
                 </div>
-                {product.isNew && (
+                {product.is_new && (
                   <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
                     NEW
                   </span>
@@ -89,7 +92,7 @@ export function ProductCatalog() {
                 {product.name}
               </span>
               <span className="text-sm text-gray-600">
-                ${product.price.toFixed(2)}
+                ${Number(product.price).toFixed(2)}
               </span>
 
               {!cartItem ? (

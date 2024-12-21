@@ -9,7 +9,171 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          discount_percentage: number
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_percentage: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_percentage?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          id: string
+          order_id: string | null
+          product_id: string | null
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          coupon_code: string | null
+          created_at: string
+          discount_amount: number | null
+          final_amount: number
+          id: string
+          status: string
+          total_amount: number
+        }
+        Insert: {
+          coupon_code?: string | null
+          created_at?: string
+          discount_amount?: number | null
+          final_amount: number
+          id?: string
+          status?: string
+          total_amount: number
+        }
+        Update: {
+          coupon_code?: string | null
+          created_at?: string
+          discount_amount?: number | null
+          final_amount?: number
+          id?: string
+          status?: string
+          total_amount?: number
+        }
+        Relationships: []
+      }
+      product_coupons: {
+        Row: {
+          coupon_id: string
+          product_id: string
+        }
+        Insert: {
+          coupon_id: string
+          product_id: string
+        }
+        Update: {
+          coupon_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_coupons_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_coupons_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image: string
+          is_new: boolean | null
+          name: string
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image: string
+          is_new?: boolean | null
+          name: string
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string
+          is_new?: boolean | null
+          name?: string
+          price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
