@@ -1,11 +1,14 @@
 import { useCart } from '@/store/useCart';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { TronWindow } from '@/components/wallet/types';
+import { OrderHeader } from '@/components/order/OrderHeader';
+import { OrderSummary } from '@/components/order/OrderSummary';
+import { PaymentButton } from '@/components/order/PaymentButton';
+import { supabase } from '@/integrations/supabase/client';
 
 const USDT_CONTRACT_ADDRESS = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
 
@@ -24,6 +27,45 @@ export default function OrderDetails() {
 
   const handleApplyCoupon = () => {
     applyCoupon(couponInput);
+  };
+
+  const createOrder = async (transactionHash: string) => {
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        total_amount: subtotal,
+        discount_amount: discountAmount,
+        final_amount: total,
+        coupon_code: couponCode,
+        phone_number: phoneNumber,
+        status: 'pending'
+      })
+      .select()
+      .single();
+
+    if (orderError) {
+      console.error('Error creating order:', orderError);
+      throw new Error('Failed to create order');
+    }
+
+    const orderItems = items.map(item => ({
+      order_id: order.id,
+      product_id: item.id,
+      quantity: item.quantity,
+      unit_price: item.price,
+      total_price: item.price * item.quantity
+    }));
+
+    const { error: itemsError } = await supabase
+      .from('order_items')
+      .insert(orderItems);
+
+    if (itemsError) {
+      console.error('Error creating order items:', itemsError);
+      throw new Error('Failed to create order items');
+    }
+
+    return order;
   };
 
   const processPayment = async () => {
@@ -85,6 +127,9 @@ export default function OrderDetails() {
       ).send();
 
       console.log('Transaction hash:', transaction);
+
+      // Create order in database
+      await createOrder(transaction);
       
       toast({
         title: "Success",
@@ -108,71 +153,36 @@ export default function OrderDetails() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white p-4 flex items-center justify-between border-b">
-        <Button 
-          variant="ghost" 
-          className="text-purple-500"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="h-5 w-5 mr-2" />
-          Back
-        </Button>
-        <h1 className="text-xl font-semibold">Checkout</h1>
-        <div className="w-16"></div>
-      </div>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      <OrderHeader />
+      
+      <OrderSummary 
+        items={items}
+        subtotal={subtotal}
+        discount={discount}
+        discountAmount={discountAmount}
+        total={total}
+        orderId={orderId}
+      />
 
-      <div className="p-4 bg-white rounded-lg shadow-sm m-4">
-        <div className="flex items-start gap-4 border-b pb-4">
-          <img
-            src="/lovable-uploads/80299426-225e-4da8-a7ca-fcc09a931f22.png"
-            alt="Konnaisseur Market"
-            className="w-20 h-20 rounded-lg"
-          />
-          <div>
-            <h2 className="font-bold text-lg">Order #{orderId}</h2>
-            <p className="text-lg">Perfect lunch from Durger King.</p>
-            <p className="text-gray-500">Konnaisseur Market</p>
-          </div>
-        </div>
-
-        <div className="py-4 space-y-3">
-          {items.map((item) => (
-            <div key={item.id} className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <span className="text-gray-600">
-                  {item.name} x{item.quantity}
-                </span>
-              </div>
-              <span>${(item.price * item.quantity).toFixed(2)}</span>
-            </div>
-          ))}
-          
-          <div className="flex justify-between items-center text-gray-500">
-            <span>Network Fee (Gas)</span>
-            <span>~$0.50</span>
+      <div className="bg-white rounded-lg shadow-sm m-4">
+        <div className="p-4 space-y-4">
+          <div className="space-y-2">
+            <Input
+              placeholder="Enter coupon code"
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value)}
+              className="mb-2"
+            />
+            <button 
+              onClick={handleApplyCoupon}
+              className="text-purple-500 text-sm font-medium"
+            >
+              Apply Coupon
+            </button>
           </div>
 
-          {/* Coupon Code Section */}
-          <div className="pt-4 border-t">
-            <div className="flex items-center space-x-2">
-              <Input
-                placeholder="Enter coupon code"
-                value={couponInput}
-                onChange={(e) => setCouponInput(e.target.value)}
-              />
-              <Button onClick={handleApplyCoupon}>Apply</Button>
-            </div>
-            {couponCode && discount > 0 && (
-              <div className="flex justify-between items-center text-green-600 mt-2">
-                <span>Discount ({couponCode})</span>
-                <span>-${discountAmount.toFixed(2)}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Phone Number Section */}
-          <div className="pt-4">
+          <div className="space-y-2">
             <Input
               type="tel"
               placeholder="Enter your phone number"
@@ -186,33 +196,19 @@ export default function OrderDetails() {
           </div>
         </div>
 
-        <div className="pt-4 border-t">
-          <div className="flex justify-between items-center">
-            <span className="text-xl font-bold">Total</span>
-            <span className="text-xl font-bold">${total.toFixed(2)}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-sm m-4">
-        <Button
-          variant="ghost"
-          className="w-full p-4 flex justify-between items-center"
+        <button
+          className="w-full p-4 flex justify-between items-center border-t"
         >
           <span className="text-lg">Pay with connected wallet</span>
           <ChevronRight className="h-5 w-5 text-gray-400" />
-        </Button>
+        </button>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4">
-        <Button 
-          className="w-full bg-purple-500 hover:bg-purple-600 text-white py-6 text-lg"
-          onClick={processPayment}
-          disabled={isProcessing || items.length === 0}
-        >
-          {isProcessing ? 'Processing...' : `Pay ${total.toFixed(2)} USDT`}
-        </Button>
-      </div>
+      <PaymentButton 
+        total={total}
+        isProcessing={isProcessing}
+        onPayment={processPayment}
+      />
     </div>
   );
 }

@@ -85,6 +85,7 @@ export type Database = {
           discount_amount: number | null
           final_amount: number
           id: string
+          phone_number: string | null
           status: string
           total_amount: number
         }
@@ -94,6 +95,7 @@ export type Database = {
           discount_amount?: number | null
           final_amount: number
           id?: string
+          phone_number?: string | null
           status?: string
           total_amount: number
         }
@@ -103,6 +105,7 @@ export type Database = {
           discount_amount?: number | null
           final_amount?: number
           id?: string
+          phone_number?: string | null
           status?: string
           total_amount?: number
         }
