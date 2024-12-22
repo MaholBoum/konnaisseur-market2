@@ -22,5 +22,8 @@ interface Window {
     contract?: () => {
       at: (address: string) => Promise<any>;
     };
+    fullNode?: {
+      getNetwork: () => Promise<{ name: string }>;
+    };
   };
 }
