@@ -14,6 +14,9 @@ export interface TronWindow extends Window {
     contract?: () => {
       at: (address: string) => Promise<any>;
     };
+    fullNode?: {
+      getNetwork: () => Promise<{ name: string }>;
+    };
   };
   tronLink?: {
     request: (args: { method: string; params?: any[] }) => Promise<any>;
