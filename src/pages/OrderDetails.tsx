@@ -34,7 +34,11 @@ export default function OrderDetails() {
 
     try {
       setIsProcessing(true);
-      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      
+      // Request account access
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts'
+      });
       
       if (!accounts || accounts.length === 0) {
         toast({
@@ -45,15 +49,47 @@ export default function OrderDetails() {
         return;
       }
 
+      // Get the current chain ID
+      const chainId = await window.ethereum.request({ 
+        method: 'eth_chainId' 
+      });
+
+      // Check if we're on the correct network (Ethereum Mainnet)
+      if (chainId !== '0x1') {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x1' }], // Ethereum Mainnet
+          });
+        } catch (switchError: any) {
+          toast({
+            title: "Error",
+            description: "Please switch to Ethereum Mainnet",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
       const fromAddress = accounts[0];
-      const amountInWei = `0x${(total * 1e18).toString(16)}`; // Convert total to Wei
+      // Convert total to Wei (1 ETH = 10^18 Wei)
+      const amountInWei = `0x${(total * 1e18).toString(16)}`;
+
+      // Merchant address - replace with your actual merchant address
+      const merchantAddress = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+
+      console.log('Initiating transaction:', {
+        from: fromAddress,
+        to: merchantAddress,
+        value: amountInWei,
+      });
 
       // Request payment transaction
       const txHash = await window.ethereum.request({
         method: 'eth_sendTransaction',
         params: [{
           from: fromAddress,
-          to: '0xYourMerchantAddress', // Replace with your merchant address
+          to: merchantAddress,
           value: amountInWei,
           gas: '0x5208', // 21000 gas
         }],
@@ -70,11 +106,11 @@ export default function OrderDetails() {
       clearCart();
       navigate('/');
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment error:', error);
       toast({
         title: "Error",
-        description: "Payment failed. Please try again.",
+        description: error.message || "Payment failed. Please try again.",
         variant: "destructive",
       });
     } finally {
