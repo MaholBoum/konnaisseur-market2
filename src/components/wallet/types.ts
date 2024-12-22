@@ -15,4 +15,8 @@ export interface TronWindow extends Window {
       at: (address: string) => Promise<any>;
     };
   };
+  tronLink?: {
+    request: (args: { method: string; params?: any[] }) => Promise<any>;
+    tronWeb?: any;
+  };
 }
