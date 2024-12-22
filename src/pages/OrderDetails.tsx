@@ -5,6 +5,9 @@ import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+import { TronWindow } from '@/components/wallet/types';
+
+const USDT_CONTRACT_ADDRESS = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
 
 export default function OrderDetails() {
   const { items, applyCoupon, couponCode, discount, clearCart } = useCart();
@@ -23,10 +26,11 @@ export default function OrderDetails() {
   };
 
   const processPayment = async () => {
-    if (!window.ethereum) {
+    const tronWindow = window as TronWindow;
+    if (!tronWindow.tronWeb) {
       toast({
         title: "Error",
-        description: "Please install MetaMask to make payments",
+        description: "Please install TronLink to make payments",
         variant: "destructive",
       });
       return;
@@ -35,12 +39,8 @@ export default function OrderDetails() {
     try {
       setIsProcessing(true);
       
-      // Request account access
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts'
-      });
-      
-      if (!accounts || accounts.length === 0) {
+      const address = tronWindow.tronWeb?.defaultAddress?.base58;
+      if (!address) {
         toast({
           title: "Error",
           description: "Please connect your wallet first",
@@ -49,53 +49,31 @@ export default function OrderDetails() {
         return;
       }
 
-      // Get the current chain ID
-      const chainId = await window.ethereum.request({ 
-        method: 'eth_chainId' 
-      });
-
-      // Check if we're on the correct network (Ethereum Mainnet)
-      if (chainId !== '0x1') {
-        try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: '0x1' }], // Ethereum Mainnet
-          });
-        } catch (switchError: any) {
-          toast({
-            title: "Error",
-            description: "Please switch to Ethereum Mainnet",
-            variant: "destructive",
-          });
-          return;
-        }
+      // Get USDT contract instance
+      const contract = await tronWindow.tronWeb?.contract().at(USDT_CONTRACT_ADDRESS);
+      if (!contract) {
+        throw new Error('Failed to load USDT contract');
       }
 
-      const fromAddress = accounts[0];
-      // Convert total to Wei (1 ETH = 10^18 Wei)
-      const amountInWei = `0x${(total * 1e18).toString(16)}`;
+      // Convert total to USDT amount (6 decimals)
+      const amount = (total * 1e6).toString();
 
       // Merchant address - replace with your actual merchant address
-      const merchantAddress = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+      const merchantAddress = 'YOUR_TRON_MERCHANT_ADDRESS';
 
       console.log('Initiating transaction:', {
-        from: fromAddress,
+        from: address,
         to: merchantAddress,
-        value: amountInWei,
+        amount: amount,
       });
 
-      // Request payment transaction
-      const txHash = await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: fromAddress,
-          to: merchantAddress,
-          value: amountInWei,
-          gas: '0x5208', // 21000 gas
-        }],
-      });
+      // Send USDT
+      const transaction = await contract.transfer(
+        merchantAddress,
+        amount
+      ).send();
 
-      console.log('Transaction hash:', txHash);
+      console.log('Transaction hash:', transaction);
       
       toast({
         title: "Success",
@@ -207,7 +185,7 @@ export default function OrderDetails() {
           onClick={processPayment}
           disabled={isProcessing || items.length === 0}
         >
-          {isProcessing ? 'Processing...' : `Pay ${total.toFixed(2)} ETH`}
+          {isProcessing ? 'Processing...' : `Pay ${total.toFixed(2)} USDT`}
         </Button>
       </div>
     </div>
