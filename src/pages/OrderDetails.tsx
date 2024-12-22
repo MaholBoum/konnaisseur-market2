@@ -13,6 +13,7 @@ export default function OrderDetails() {
   const { items, applyCoupon, couponCode, discount, clearCart } = useCart();
   const navigate = useNavigate();
   const [couponInput, setCouponInput] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   
@@ -26,6 +27,15 @@ export default function OrderDetails() {
   };
 
   const processPayment = async () => {
+    if (!phoneNumber.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your phone number for delivery coordination",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const tronWindow = window as TronWindow;
     if (!tronWindow.tronWeb) {
       toast({
@@ -65,6 +75,7 @@ export default function OrderDetails() {
         from: address,
         to: merchantAddress,
         amount: amount,
+        phoneNumber: phoneNumber
       });
 
       // Send USDT
@@ -158,6 +169,20 @@ export default function OrderDetails() {
                 <span>-${discountAmount.toFixed(2)}</span>
               </div>
             )}
+          </div>
+
+          {/* Phone Number Section */}
+          <div className="pt-4">
+            <Input
+              type="tel"
+              placeholder="Enter your phone number"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="mb-2"
+            />
+            <p className="text-sm text-gray-500 italic">
+              Enter phone number to be called by an independent mailman
+            </p>
           </div>
         </div>
 
