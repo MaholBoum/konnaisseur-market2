@@ -4,7 +4,8 @@ import { TronWindow } from '@/components/wallet/types';
 import { supabase } from '@/integrations/supabase/client';
 import { CartItem } from '@/types/product';
 
-const USDT_CONTRACT_ADDRESS = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
+// Testnet USDT Contract Address
+const USDT_CONTRACT_ADDRESS = 'TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj';
 const MERCHANT_ADDRESS = 'TTLxUTKUeqYJzE48CCPmJ2tESrnfrTW8XK';
 
 interface PaymentProcessorProps {
@@ -91,6 +92,19 @@ export const PaymentProcessor = ({
     try {
       setIsProcessing(true);
       
+      // Check if we're on testnet
+      const network = await tronWindow.tronWeb.fullNode.getNetwork();
+      console.log('Current network:', network);
+      
+      if (!network || network.name !== 'shasta') {
+        toast({
+          title: "Error",
+          description: "Please switch to Shasta Testnet in TronLink",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const address = tronWindow.tronWeb?.defaultAddress?.base58;
       if (!address) {
         toast({
@@ -108,11 +122,12 @@ export const PaymentProcessor = ({
 
       const amount = (total * 1e6).toString();
 
-      console.log('Initiating transaction:', {
+      console.log('Initiating testnet transaction:', {
         from: address,
         to: MERCHANT_ADDRESS,
         amount: amount,
-        phoneNumber: phoneNumber
+        phoneNumber: phoneNumber,
+        network: 'testnet'
       });
 
       const transaction = await contract.transfer(
@@ -126,7 +141,7 @@ export const PaymentProcessor = ({
       
       toast({
         title: "Success",
-        description: "Payment processed successfully!",
+        description: "Test payment processed successfully!",
       });
 
       onSuccess();
