@@ -17,16 +17,14 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/order-details" element={<OrderDetails />} />
-          </Routes>
-        </Router>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/order-details" element={<OrderDetails />} />
+        </Routes>
+      </Router>
+    </QueryClientProvider>
   );
 }
 
