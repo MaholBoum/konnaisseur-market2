@@ -1,6 +1,6 @@
 import { CartItem } from '@/types/product';
 import { useEffect, useState } from 'react';
-import { GasIcon } from 'lucide-react';
+import { Gauge } from 'lucide-react';
 
 interface OrderSummaryProps {
   items: CartItem[];
@@ -72,7 +72,7 @@ export const OrderSummary = ({
         
         <div className="flex justify-between items-center text-gray-500">
           <div className="flex items-center gap-2">
-            <GasIcon className="h-4 w-4" />
+            <Gauge className="h-4 w-4" />
             <span>Network Fee (Gas)</span>
           </div>
           <span>~{estimatedGas.toFixed(4)} TRX</span>
