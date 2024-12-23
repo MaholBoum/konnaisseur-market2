@@ -120,9 +120,25 @@ export const PaymentProcessor = ({
         throw new Error('Failed to load USDT contract');
       }
 
-      const amount = (total * 1e6).toString();
+      const amount = (total * 1e6).toString(); // Convert to USDT decimals (6)
 
-      console.log('Initiating testnet transaction:', {
+      console.log('Checking allowance...');
+      const allowance = await contract.allowance(address, MERCHANT_ADDRESS).call();
+      const currentAllowance = parseInt(allowance._hex, 16);
+      
+      if (currentAllowance < Number(amount)) {
+        console.log('Approving USDT spend...');
+        const approvalTx = await contract.approve(
+          MERCHANT_ADDRESS,
+          amount
+        ).send();
+        console.log('Approval transaction:', approvalTx);
+        
+        // Wait for approval confirmation
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+
+      console.log('Initiating transfer:', {
         from: address,
         to: MERCHANT_ADDRESS,
         amount: amount,
@@ -141,7 +157,7 @@ export const PaymentProcessor = ({
       
       toast({
         title: "Success",
-        description: "Test payment processed successfully!",
+        description: "Payment processed successfully!",
       });
 
       onSuccess();
