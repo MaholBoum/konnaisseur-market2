@@ -40,29 +40,56 @@ export const useWalletConnection = () => {
     }
   };
 
+  const authenticateWithSupabase = async (address: string) => {
+    try {
+      console.log('Authenticating wallet address with Supabase:', address);
+      
+      // First try to sign up the user
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: `${address.toLowerCase()}@wallet.auth`,
+        password: `${address}_${Date.now()}`, // Use a unique password
+      });
+
+      if (signUpError && !signUpError.message.includes('User already registered')) {
+        console.error('Error signing up:', signUpError);
+        throw signUpError;
+      }
+
+      // If sign up succeeded or user exists, try to sign in
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: `${address.toLowerCase()}@wallet.auth`,
+        password: `${address}_${Date.now()}`, // Use the same password format
+      });
+
+      if (signInError) {
+        console.error('Error signing in:', signInError);
+        throw signInError;
+      }
+
+      console.log('Successfully authenticated with Supabase');
+      return signInData;
+    } catch (error) {
+      console.error('Authentication error:', error);
+      throw error;
+    }
+  };
+
   const connectWallet = async () => {
     try {
-      // First check if TronLink is installed
+      // Check if TronLink is installed
       if (!window.tronLink) {
         toast({
           title: "TronLink Not Found",
           description: "Please install TronLink wallet first",
           variant: "destructive",
         });
-        window.open('https://www.tronlink.org/', '_blank');
+        setTimeout(() => {
+          window.open('https://www.tronlink.org/', '_blank');
+        }, 1500);
         return;
       }
 
-      // Check if already connected
-      if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-        console.log('TronLink already connected');
-        const address = window.tronWeb.defaultAddress.base58;
-        const balance = await getUSDTBalance(address);
-        setWalletState({ address, balance });
-        return;
-      }
-
-      // Request account access
+      // Request account access using TronLink's recommended method
       console.log('Requesting TronLink access...');
       const res = await window.tronLink.request({ method: 'tron_requestAccounts' });
       console.log('TronLink response:', res);
@@ -81,31 +108,14 @@ export const useWalletConnection = () => {
           const balance = await getUSDTBalance(address);
           setWalletState({ address, balance });
 
-          // Create or update user authentication in Supabase
           try {
-            const { error: authError } = await supabase.auth.signInWithPassword({
-              email: `${address.toLowerCase()}@wallet.auth`,
-              password: address,
-            });
-
-            if (authError && authError.message.includes('Invalid login credentials')) {
-              const { error: signUpError } = await supabase.auth.signUp({
-                email: `${address.toLowerCase()}@wallet.auth`,
-                password: address,
-              });
-
-              if (signUpError) {
-                console.error('Error creating wallet auth:', signUpError);
-                throw new Error('Failed to authenticate wallet');
-              }
-            }
-
+            await authenticateWithSupabase(address);
             toast({
               title: "Success",
               description: "Wallet connected successfully!",
             });
-          } catch (error) {
-            console.error('Auth error:', error);
+          } catch (error: any) {
+            console.error('Wallet authentication error:', error);
             toast({
               title: "Error",
               description: "Failed to authenticate wallet",
