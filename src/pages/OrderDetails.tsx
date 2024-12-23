@@ -1,5 +1,4 @@
 import { useCart } from '@/store/useCart';
-import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { OrderHeader } from '@/components/order/OrderHeader';
@@ -7,7 +6,7 @@ import { OrderSummary } from '@/components/order/OrderSummary';
 import { PaymentButton } from '@/components/order/PaymentButton';
 import { CouponInput } from '@/components/order/CouponInput';
 import { PhoneInput } from '@/components/order/PhoneInput';
-import { PaymentProcessor } from '@/components/order/PaymentProcessor';
+import { usePaymentProcessor } from '@/components/order/PaymentProcessor';
 
 export default function OrderDetails() {
   const { items, applyCoupon, couponCode, discount, clearCart } = useCart();
@@ -24,7 +23,7 @@ export default function OrderDetails() {
     applyCoupon(couponInput);
   };
 
-  const { processPayment, isProcessing } = PaymentProcessor({
+  const { processPayment, isProcessing } = usePaymentProcessor({
     items,
     subtotal,
     discountAmount,

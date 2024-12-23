@@ -8,7 +8,7 @@ import { CartItem } from '@/types/product';
 const USDT_CONTRACT_ADDRESS = 'TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj';
 const MERCHANT_ADDRESS = 'TTLxUTKUeqYJzE48CCPmJ2tESrnfrTW8XK';
 
-interface PaymentProcessorProps {
+interface UsePaymentProcessorProps {
   items: CartItem[];
   subtotal: number;
   discountAmount: number;
@@ -18,7 +18,7 @@ interface PaymentProcessorProps {
   onSuccess: () => void;
 }
 
-export const PaymentProcessor = ({
+export const usePaymentProcessor = ({
   items,
   subtotal,
   discountAmount,
@@ -26,7 +26,7 @@ export const PaymentProcessor = ({
   phoneNumber,
   couponCode,
   onSuccess
-}: PaymentProcessorProps) => {
+}: UsePaymentProcessorProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
