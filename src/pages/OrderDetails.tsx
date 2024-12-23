@@ -63,13 +63,6 @@ export default function OrderDetails() {
             onPhoneChange={setPhoneNumber}
           />
         </div>
-
-        <button
-          className="w-full p-4 flex justify-between items-center border-t"
-        >
-          <span className="text-lg">Pay with connected wallet</span>
-          <ChevronRight className="h-5 w-5 text-gray-400" />
-        </button>
       </div>
 
       <PaymentButton 
