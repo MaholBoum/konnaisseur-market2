@@ -91,20 +91,21 @@ export const useWalletConnection = () => {
 
       // Request account access using TronLink's recommended method
       console.log('Requesting TronLink access...');
-      const res = await window.tronLink.request({ method: 'tron_requestAccounts' });
-      console.log('TronLink response:', res);
-
-      // Wait for TronWeb injection
+      await window.tronLink.request({ method: 'tron_requestAccounts' });
+      
+      // Wait for TronWeb injection with increased timeout and attempts
       let attempts = 0;
-      const maxAttempts = 10;
+      const maxAttempts = 20; // Increased from 10 to 20
+      const interval = 1000; // 1 second between attempts
       
       const waitForTronWeb = setInterval(async () => {
         attempts++;
         console.log(`Checking for TronWeb... Attempt ${attempts}`);
 
-        if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+        const tronWeb = getTronWeb();
+        if (tronWeb && tronWeb.defaultAddress && tronWeb.defaultAddress.base58) {
           clearInterval(waitForTronWeb);
-          const address = window.tronWeb.defaultAddress.base58;
+          const address = tronWeb.defaultAddress.base58;
           const balance = await getUSDTBalance(address);
           setWalletState({ address, balance });
 
@@ -124,9 +125,14 @@ export const useWalletConnection = () => {
           }
         } else if (attempts >= maxAttempts) {
           clearInterval(waitForTronWeb);
+          toast({
+            title: "Error",
+            description: "Failed to connect to TronLink. Please try again.",
+            variant: "destructive",
+          });
           throw new Error('TronWeb not found after multiple attempts');
         }
-      }, 500);
+      }, interval);
 
     } catch (error: any) {
       console.error('Wallet connection error:', error);
