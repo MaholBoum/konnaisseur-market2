@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Index from './pages/Index';
 import OrderDetails from './pages/OrderDetails';
 import './App.css';
+import { useTelegramApp } from './hooks/useTelegramApp';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -16,6 +17,12 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const { initWebApp } = useTelegramApp();
+
+  useEffect(() => {
+    initWebApp();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
