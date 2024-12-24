@@ -45,24 +45,24 @@ export function ProductCatalog() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      <div className="flex justify-center items-center min-h-screen bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen text-red-500">
+      <div className="flex justify-center items-center min-h-screen bg-background text-destructive">
         Error loading products. Please try again later.
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <div className="flex justify-between items-center px-4 py-3 bg-white">
-        <h1 className="text-xl font-semibold">Konnaisseur Market</h1>
+    <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex justify-between items-center px-4 py-3 bg-card">
+        <h1 className="text-xl font-semibold text-card-foreground">Konnaisseur Market</h1>
       </div>
       
       <div className="grid grid-cols-2 gap-3 p-3 pb-24">
@@ -80,7 +80,7 @@ export function ProductCatalog() {
         })}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-card border-t border-border">
         <Button 
           className="w-full bg-green-500 hover:bg-green-600 text-white py-6 text-lg rounded-xl"
           onClick={() => navigate('/order-details')}
