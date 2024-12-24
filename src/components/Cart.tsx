@@ -96,11 +96,11 @@ export function Cart() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
+    <div className="bg-background text-foreground rounded-lg shadow-lg p-6 max-w-md mx-auto border border-border">
       <h2 className="text-2xl font-bold mb-6">Your Cart</h2>
       
       {items.length === 0 ? (
-        <p className="text-gray-500 text-center">Your cart is empty</p>
+        <p className="text-muted-foreground text-center">Your cart is empty</p>
       ) : (
         <>
           {items.map((item) => (

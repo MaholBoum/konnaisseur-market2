@@ -10,15 +10,15 @@ interface CartItemProps {
 
 export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps) {
   return (
-    <div className="flex items-center py-4 border-b">
+    <div className="flex items-center py-4 border-b border-border">
       <img
         src={item.image}
         alt={item.name}
-        className="w-16 h-16 object-cover rounded"
+        className="w-16 h-16 object-cover rounded bg-muted"
       />
       <div className="ml-4 flex-1">
-        <h3 className="font-semibold">{item.name}</h3>
-        <p className="text-sm text-gray-600">{item.price} ETH</p>
+        <h3 className="font-semibold text-foreground">{item.name}</h3>
+        <p className="text-sm text-muted-foreground">{item.price} ETH</p>
       </div>
       <div className="flex items-center space-x-2">
         <Button
@@ -28,7 +28,7 @@ export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps
         >
           <Minus className="h-4 w-4" />
         </Button>
-        <span className="w-8 text-center">{item.quantity}</span>
+        <span className="w-8 text-center text-foreground">{item.quantity}</span>
         <Button
           variant="outline"
           size="icon"
