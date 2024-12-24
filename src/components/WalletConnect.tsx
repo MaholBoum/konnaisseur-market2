@@ -5,18 +5,39 @@ import { useEffect, useState } from 'react';
 
 export function WalletConnect() {
   const { address, balance, connectWallet } = useWalletConnection();
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    // Check localStorage first, then system preference
+    const stored = localStorage.getItem('theme');
+    if (stored) {
+      return stored === 'dark';
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
   useEffect(() => {
-    // Check if dark mode is already enabled
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    setIsDark(isDarkMode);
+    // Apply the theme on mount and when it changes
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDark]);
+
+  // Listen for system theme changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsDark(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   const toggleDarkMode = () => {
-    const newMode = !isDark;
-    setIsDark(newMode);
-    document.documentElement.classList.toggle('dark');
+    setIsDark(!isDark);
   };
 
   return (
