@@ -77,7 +77,7 @@ export function Cart() {
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto p-4">
         <div className="bg-card rounded-lg shadow-lg p-6 border border-border">
-          <h2 className="text-2xl font-bold mb-6 text-foreground">Your Cart</h2>
+          <h2 className="text-2xl font-bold mb-6 text-card-foreground">Your Cart</h2>
           
           {items.length === 0 ? (
             <p className="text-muted-foreground text-center">Your cart is empty</p>

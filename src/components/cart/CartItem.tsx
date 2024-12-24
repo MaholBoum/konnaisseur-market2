@@ -18,7 +18,7 @@ export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps
       />
       
       <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-medium text-foreground truncate">
+        <h3 className="text-sm font-medium text-card-foreground truncate">
           {item.name}
         </h3>
         <p className="text-sm text-muted-foreground">
@@ -30,20 +30,20 @@ export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 bg-card"
           onClick={() => onUpdateQuantity(item.id, Math.max(0, item.quantity - 1))}
         >
           <Minus className="h-4 w-4" />
         </Button>
         
-        <span className="w-8 text-center text-sm text-foreground">
+        <span className="w-8 text-center text-sm text-card-foreground">
           {item.quantity}
         </span>
         
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 bg-card"
           onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
         >
           <Plus className="h-4 w-4" />
@@ -52,7 +52,7 @@ export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 bg-card"
           onClick={() => onRemoveItem(item.id)}
         >
           <Trash2 className="h-4 w-4 text-destructive" />
