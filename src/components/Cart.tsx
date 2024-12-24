@@ -74,13 +74,13 @@ export function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black">
       <div className="max-w-md mx-auto p-4">
-        <div className="bg-white dark:bg-[#1C1C1C] rounded-lg shadow-lg p-6 border border-border dark:border-border/10">
-          <h2 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Your Cart</h2>
+        <div className="bg-white dark:bg-[#1C1C1E] rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Your Cart</h2>
           
           {items.length === 0 ? (
-            <p className="text-muted-foreground dark:text-gray-400 text-center">Your cart is empty</p>
+            <p className="text-gray-500 dark:text-gray-400 text-center">Your cart is empty</p>
           ) : (
             <>
               {items.map((item) => (
