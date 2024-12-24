@@ -1,20 +1,24 @@
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+
 interface OrderHeaderProps {
   orderId: number;
 }
 
 export function OrderHeader({ orderId }: OrderHeaderProps) {
+  const navigate = useNavigate();
+
   return (
-    <div className="flex items-start gap-4 border-b pb-4">
-      <img
-        src="/lovable-uploads/80299426-225e-4da8-a7ca-fcc09a931f22.png"
-        alt="Konnaisseur Market"
-        className="w-20 h-20 rounded-lg"
-      />
-      <div>
-        <h2 className="font-bold text-lg">Order #{orderId}</h2>
-        <p className="text-lg">Perfect lunch from Durger King.</p>
-        <p className="text-gray-500">Konnaisseur Market</p>
-      </div>
+    <div className="p-4 border-b">
+      <Button 
+        variant="ghost" 
+        onClick={() => navigate('/')}
+        className="flex items-center gap-2"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back
+      </Button>
     </div>
   );
 }
