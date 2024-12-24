@@ -10,7 +10,7 @@ interface CartItemProps {
 
 export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps) {
   return (
-    <div className="flex items-center py-4 border-b border-border">
+    <div className="flex items-center py-4 border-b border-border dark:border-border/50">
       <img
         src={item.image}
         alt={item.name}
@@ -25,6 +25,7 @@ export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps
           variant="outline"
           size="icon"
           onClick={() => onUpdateQuantity(item.id, Math.max(0, item.quantity - 1))}
+          className="dark:bg-secondary dark:hover:bg-secondary/80"
         >
           <Minus className="h-4 w-4" />
         </Button>
@@ -33,6 +34,7 @@ export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps
           variant="outline"
           size="icon"
           onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+          className="dark:bg-secondary dark:hover:bg-secondary/80"
         >
           <Plus className="h-4 w-4" />
         </Button>
@@ -40,6 +42,7 @@ export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps
           variant="ghost"
           size="icon"
           onClick={() => onRemoveItem(item.id)}
+          className="dark:hover:bg-secondary/80"
         >
           <X className="h-4 w-4" />
         </Button>
