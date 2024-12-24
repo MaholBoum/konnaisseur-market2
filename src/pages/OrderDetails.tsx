@@ -38,7 +38,7 @@ export default function OrderDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <OrderHeader />
+      <OrderHeader orderId={orderId} />
       
       <OrderSummary 
         items={items}
