@@ -7,7 +7,7 @@ const productEmojis: Record<string, string> = {
   'montgolfiere': '🎈',
   'bois bande premium': '🪵',
   'rails': '🛤️',
-  'Tshirt PRELEVEUR': '👕',
+  'tshirt preleveur': '👕',  // Changed to lowercase for consistent matching
 };
 
 interface ProductCardProps {
@@ -23,7 +23,7 @@ export function ProductCard({
   onAddToCart, 
   onUpdateQuantity 
 }: ProductCardProps) {
-  // Get emoji based on product name or use a default package emoji
+  // Get emoji based on product name (case-insensitive) or use a default package emoji
   const emoji = productEmojis[product.name.toLowerCase()] || '📦';
 
   return (
