@@ -60,12 +60,12 @@ export function ProductCatalog() {
   }
 
   return (
-    <div className="flex flex-col space-y-4">
-      <div className="flex justify-between items-center px-4">
-        <h1 className="text-2xl font-bold">Konnaisseur Market</h1>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <div className="flex justify-between items-center px-4 py-3 bg-white">
+        <h1 className="text-xl font-semibold">Konnaisseur Market</h1>
       </div>
       
-      <div className="grid grid-cols-2 gap-4 p-4">
+      <div className="grid grid-cols-3 gap-4 p-4 pb-24">
         {products?.map((product) => {
           const cartItem = items.find(item => item.id === product.id);
           return (
@@ -80,9 +80,9 @@ export function ProductCatalog() {
         })}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white">
         <Button 
-          className="w-full bg-green-500 hover:bg-green-600 text-white py-6 text-lg"
+          className="w-full bg-green-500 hover:bg-green-600 text-white py-6 text-lg rounded-xl"
           onClick={() => navigate('/order-details')}
         >
           VIEW ORDER
