@@ -96,7 +96,7 @@ export function Cart() {
   };
 
   return (
-    <div className="bg-background text-foreground rounded-lg shadow-lg p-6 max-w-md mx-auto border border-border">
+    <div className="bg-background dark:bg-secondary text-foreground rounded-lg shadow-lg p-6 max-w-md mx-auto border border-border">
       <h2 className="text-2xl font-bold mb-6">Your Cart</h2>
       
       {items.length === 0 ? (

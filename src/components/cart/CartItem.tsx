@@ -14,7 +14,7 @@ export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps
       <img
         src={item.image}
         alt={item.name}
-        className="w-16 h-16 object-cover rounded bg-muted"
+        className="w-16 h-16 object-cover rounded bg-muted dark:bg-secondary"
       />
       <div className="ml-4 flex-1">
         <h3 className="font-semibold text-foreground">{item.name}</h3>
