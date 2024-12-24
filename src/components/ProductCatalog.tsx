@@ -65,7 +65,7 @@ export function ProductCatalog() {
         <h1 className="text-xl font-semibold">Konnaisseur Market</h1>
       </div>
       
-      <div className="grid grid-cols-3 gap-4 p-4 pb-24">
+      <div className="grid grid-cols-2 gap-3 p-3 pb-24">
         {products?.map((product) => {
           const cartItem = items.find(item => item.id === product.id);
           return (
