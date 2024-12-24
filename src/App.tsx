@@ -7,11 +7,10 @@ import OrderDetails from './pages/OrderDetails';
 import './App.css';
 import { useTelegramApp } from './hooks/useTelegramApp';
 
-// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
       retry: 1,
     },
   },
@@ -31,7 +30,7 @@ function App() {
       enableSystem
       disableTransitionOnChange
     >
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-background font-sans antialiased">
         <QueryClientProvider client={queryClient}>
           <Router>
             <Routes>

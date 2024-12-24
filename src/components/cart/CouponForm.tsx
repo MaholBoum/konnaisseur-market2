@@ -21,7 +21,7 @@ export function CouponForm({
         value={couponInput}
         onChange={(e) => onCouponInputChange(e.target.value)}
         disabled={isApplyingCoupon}
-        className="bg-card text-card-foreground"
+        className="bg-card text-card-foreground border-border"
       />
       <Button 
         onClick={onApplyCoupon}
