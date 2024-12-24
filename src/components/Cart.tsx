@@ -3,9 +3,10 @@ import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CartItem } from './cart/CartItem';
-import { CartSummary } from './cart/CartSummary';
-import { CouponForm } from './cart/CouponForm';
-import { CheckoutButton } from './cart/CheckoutButton';
+import { CartContainer } from './cart/CartContainer';
+import { CartHeader } from './cart/CartHeader';
+import { EmptyCart } from './cart/EmptyCart';
+import { CartActions } from './cart/CartActions';
 import { createOrder } from './cart/orderService';
 
 export function Cart() {
@@ -74,50 +75,36 @@ export function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-md mx-auto p-4">
-        <div className="bg-card rounded-lg shadow-lg p-6 border border-border">
-          <h2 className="text-2xl font-bold mb-6 text-card-foreground">Your Cart</h2>
+    <CartContainer>
+      <CartHeader />
+      {items.length === 0 ? (
+        <EmptyCart />
+      ) : (
+        <>
+          {items.map((item) => (
+            <CartItem
+              key={item.id}
+              item={item}
+              onUpdateQuantity={updateQuantity}
+              onRemoveItem={removeItem}
+            />
+          ))}
           
-          {items.length === 0 ? (
-            <p className="text-muted-foreground text-center">Your cart is empty</p>
-          ) : (
-            <>
-              {items.map((item) => (
-                <CartItem
-                  key={item.id}
-                  item={item}
-                  onUpdateQuantity={updateQuantity}
-                  onRemoveItem={removeItem}
-                />
-              ))}
-
-              <div className="mt-6 space-y-4">
-                <CouponForm
-                  couponInput={couponInput}
-                  isApplyingCoupon={isApplyingCoupon}
-                  onCouponInputChange={setCouponInput}
-                  onApplyCoupon={handleApplyCoupon}
-                />
-
-                <CartSummary
-                  subtotal={subtotal}
-                  discount={discount}
-                  discountAmount={discountAmount}
-                  total={total}
-                  couponCode={couponCode}
-                />
-
-                <CheckoutButton
-                  isProcessing={isProcessing}
-                  onCheckout={handleCheckout}
-                  disabled={items.length === 0}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+          <CartActions
+            subtotal={subtotal}
+            discount={discount}
+            discountAmount={discountAmount}
+            total={total}
+            couponCode={couponCode}
+            couponInput={couponInput}
+            isApplyingCoupon={isApplyingCoupon}
+            isProcessing={isProcessing}
+            onCouponInputChange={setCouponInput}
+            onApplyCoupon={handleApplyCoupon}
+            onCheckout={handleCheckout}
+          />
+        </>
+      )}
+    </CartContainer>
   );
 }
