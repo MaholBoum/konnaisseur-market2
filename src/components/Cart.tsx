@@ -74,9 +74,9 @@ export function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-gray-50 dark:bg-black">
       <div className="max-w-md mx-auto p-4">
-        <div className="bg-white dark:bg-[#1C1C1E] rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-[#1C1C1E] rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-800">
           <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Your Cart</h2>
           
           {items.length === 0 ? (

@@ -8,7 +8,7 @@ interface CartSummaryProps {
 
 export function CartSummary({ subtotal, discount, discountAmount, total, couponCode }: CartSummaryProps) {
   return (
-    <div className="space-y-2 p-4 rounded-lg bg-gray-50 dark:bg-[#161616] border border-gray-200 dark:border-gray-700">
+    <div className="space-y-2 p-4 rounded-lg bg-gray-50 dark:bg-[#161616] border border-gray-200 dark:border-gray-800">
       <div className="flex justify-between text-gray-900 dark:text-gray-200">
         <span>Subtotal</span>
         <span>{subtotal.toFixed(2)} USDT</span>

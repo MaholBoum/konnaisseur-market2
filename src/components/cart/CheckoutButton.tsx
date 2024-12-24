@@ -9,7 +9,7 @@ interface CheckoutButtonProps {
 export function CheckoutButton({ isProcessing, onCheckout, disabled }: CheckoutButtonProps) {
   return (
     <Button 
-      className="w-full bg-[#9b87f5] hover:bg-[#8b77e5] text-white py-6 text-lg transition-colors duration-200"
+      className="w-full bg-[#9b87f5] hover:bg-[#8b77e5] text-white py-6 text-lg transition-colors duration-200 dark:bg-[#9b87f5] dark:hover:bg-[#8b77e5]"
       onClick={onCheckout}
       disabled={isProcessing || disabled}
     >
