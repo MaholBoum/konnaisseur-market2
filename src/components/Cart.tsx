@@ -96,48 +96,50 @@ export function Cart() {
   };
 
   return (
-    <div className="bg-background dark:bg-secondary text-foreground rounded-lg shadow-lg p-6 max-w-md mx-auto border border-border">
-      <h2 className="text-2xl font-bold mb-6">Your Cart</h2>
-      
-      {items.length === 0 ? (
-        <p className="text-muted-foreground text-center">Your cart is empty</p>
-      ) : (
-        <>
-          {items.map((item) => (
-            <CartItem
-              key={item.id}
-              item={item}
-              onUpdateQuantity={updateQuantity}
-              onRemoveItem={removeItem}
-            />
-          ))}
+    <div className="min-h-screen bg-background dark:bg-secondary p-4">
+      <div className="max-w-md mx-auto bg-background dark:bg-secondary-900 rounded-lg shadow-lg p-6 border border-border dark:border-border/50">
+        <h2 className="text-2xl font-bold mb-6 text-foreground dark:text-foreground">Your Cart</h2>
+        
+        {items.length === 0 ? (
+          <p className="text-muted-foreground text-center">Your cart is empty</p>
+        ) : (
+          <>
+            {items.map((item) => (
+              <CartItem
+                key={item.id}
+                item={item}
+                onUpdateQuantity={updateQuantity}
+                onRemoveItem={removeItem}
+              />
+            ))}
 
-          <div className="mt-6 space-y-4">
-            <CouponForm
-              couponInput={couponInput}
-              isApplyingCoupon={isApplyingCoupon}
-              onCouponInputChange={setCouponInput}
-              onApplyCoupon={handleApplyCoupon}
-            />
+            <div className="mt-6 space-y-4">
+              <CouponForm
+                couponInput={couponInput}
+                isApplyingCoupon={isApplyingCoupon}
+                onCouponInputChange={setCouponInput}
+                onApplyCoupon={handleApplyCoupon}
+              />
 
-            <CartSummary
-              subtotal={subtotal}
-              discount={discount}
-              discountAmount={discountAmount}
-              total={total}
-              couponCode={couponCode}
-            />
+              <CartSummary
+                subtotal={subtotal}
+                discount={discount}
+                discountAmount={discountAmount}
+                total={total}
+                couponCode={couponCode}
+              />
 
-            <Button 
-              className="w-full"
-              onClick={createOrder}
-              disabled={isProcessing || items.length === 0}
-            >
-              {isProcessing ? 'Processing...' : 'Place Order'}
-            </Button>
-          </div>
-        </>
-      )}
+              <Button 
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                onClick={createOrder}
+                disabled={isProcessing || items.length === 0}
+              >
+                {isProcessing ? 'Processing...' : 'Place Order'}
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
