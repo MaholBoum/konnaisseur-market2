@@ -60,7 +60,7 @@ export const OrderSummary = ({
   return (
     <div className="p-4 bg-white rounded-lg shadow-sm m-4">
       <div className="flex items-start gap-4 border-b pb-4">
-        <div className="w-20 h-20 flex items-center justify-center text-4xl bg-gray-100 rounded-lg">
+        <div className="w-20 h-20 flex items-center justify-center text-6xl">
           📦
         </div>
         <div>
