@@ -1,12 +1,12 @@
 import { useCart } from '@/store/useCart';
-import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CartItem } from './cart/CartItem';
 import { CartSummary } from './cart/CartSummary';
 import { CouponForm } from './cart/CouponForm';
+import { CheckoutButton } from './cart/CheckoutButton';
+import { createOrder } from './cart/orderService';
 
 export function Cart() {
   const { items, removeItem, updateQuantity, applyCoupon, couponCode, discount, clearCart } = useCart();
@@ -43,46 +43,24 @@ export function Cart() {
     }
   };
 
-  const createOrder = async () => {
+  const handleCheckout = async () => {
     try {
       setIsProcessing(true);
-      console.log('Creating order with items:', items);
-
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          total_amount: subtotal,
-          discount_amount: discountAmount,
-          final_amount: total,
-          coupon_code: couponCode,
-          status: 'pending'
-        })
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      const orderItems = items.map(item => ({
-        order_id: order.id,
-        product_id: item.id,
-        quantity: item.quantity,
-        unit_price: item.price,
-        total_price: item.price * item.quantity
-      }));
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-      
-      clearCart();
-      toast({
-        title: "Order placed successfully!",
-        description: "Your order has been created and is being processed.",
+      await createOrder({
+        items,
+        subtotal,
+        discountAmount,
+        total,
+        couponCode,
+        onSuccess: () => {
+          clearCart();
+          toast({
+            title: "Order placed successfully!",
+            description: "Your order has been created and is being processed.",
+          });
+          navigate('/order-details');
+        }
       });
-      
-      navigate('/order-details');
     } catch (error) {
       console.error('Error processing order:', error);
       toast({
@@ -96,49 +74,49 @@ export function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#000000] p-4">
-      <div className="max-w-md mx-auto bg-white dark:bg-[#1C1C1C] rounded-lg shadow-lg p-6 border border-border dark:border-border/10">
-        <h2 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Your Cart</h2>
-        
-        {items.length === 0 ? (
-          <p className="text-muted-foreground dark:text-gray-400 text-center">Your cart is empty</p>
-        ) : (
-          <>
-            {items.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onUpdateQuantity={updateQuantity}
-                onRemoveItem={removeItem}
-              />
-            ))}
+    <div className="min-h-screen bg-background dark:bg-[#000000]">
+      <div className="max-w-md mx-auto p-4">
+        <div className="bg-white dark:bg-[#1C1C1C] rounded-lg shadow-lg p-6 border border-border dark:border-border/10">
+          <h2 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Your Cart</h2>
+          
+          {items.length === 0 ? (
+            <p className="text-muted-foreground dark:text-gray-400 text-center">Your cart is empty</p>
+          ) : (
+            <>
+              {items.map((item) => (
+                <CartItem
+                  key={item.id}
+                  item={item}
+                  onUpdateQuantity={updateQuantity}
+                  onRemoveItem={removeItem}
+                />
+              ))}
 
-            <div className="mt-6 space-y-4">
-              <CouponForm
-                couponInput={couponInput}
-                isApplyingCoupon={isApplyingCoupon}
-                onCouponInputChange={setCouponInput}
-                onApplyCoupon={handleApplyCoupon}
-              />
+              <div className="mt-6 space-y-4">
+                <CouponForm
+                  couponInput={couponInput}
+                  isApplyingCoupon={isApplyingCoupon}
+                  onCouponInputChange={setCouponInput}
+                  onApplyCoupon={handleApplyCoupon}
+                />
 
-              <CartSummary
-                subtotal={subtotal}
-                discount={discount}
-                discountAmount={discountAmount}
-                total={total}
-                couponCode={couponCode}
-              />
+                <CartSummary
+                  subtotal={subtotal}
+                  discount={discount}
+                  discountAmount={discountAmount}
+                  total={total}
+                  couponCode={couponCode}
+                />
 
-              <Button 
-                className="w-full bg-[#9b87f5] hover:bg-[#8b77e5] text-white py-6 text-lg"
-                onClick={createOrder}
-                disabled={isProcessing || items.length === 0}
-              >
-                {isProcessing ? 'Processing...' : 'Place Order'}
-              </Button>
-            </div>
-          </>
-        )}
+                <CheckoutButton
+                  isProcessing={isProcessing}
+                  onCheckout={handleCheckout}
+                  disabled={items.length === 0}
+                />
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
