@@ -1,13 +1,12 @@
 import { useCart } from '@/store/useCart';
+import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CartItem } from './cart/CartItem';
-import { CartContainer } from './cart/CartContainer';
-import { CartHeader } from './cart/CartHeader';
-import { EmptyCart } from './cart/EmptyCart';
-import { CartActions } from './cart/CartActions';
-import { createOrder } from './cart/orderService';
+import { CartSummary } from './cart/CartSummary';
+import { CouponForm } from './cart/CouponForm';
 
 export function Cart() {
   const { items, removeItem, updateQuantity, applyCoupon, couponCode, discount, clearCart } = useCart();
@@ -44,24 +43,46 @@ export function Cart() {
     }
   };
 
-  const handleCheckout = async () => {
+  const createOrder = async () => {
     try {
       setIsProcessing(true);
-      await createOrder({
-        items,
-        subtotal,
-        discountAmount,
-        total,
-        couponCode,
-        onSuccess: () => {
-          clearCart();
-          toast({
-            title: "Order placed successfully!",
-            description: "Your order has been created and is being processed.",
-          });
-          navigate('/order-details');
-        }
+      console.log('Creating order with items:', items);
+
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          total_amount: subtotal,
+          discount_amount: discountAmount,
+          final_amount: total,
+          coupon_code: couponCode,
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      const orderItems = items.map(item => ({
+        order_id: order.id,
+        product_id: item.id,
+        quantity: item.quantity,
+        unit_price: item.price,
+        total_price: item.price * item.quantity
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+      
+      clearCart();
+      toast({
+        title: "Order placed successfully!",
+        description: "Your order has been created and is being processed.",
       });
+      
+      navigate('/order-details');
     } catch (error) {
       console.error('Error processing order:', error);
       toast({
@@ -75,10 +96,11 @@ export function Cart() {
   };
 
   return (
-    <CartContainer>
-      <CartHeader />
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-6">Your Cart</h2>
+      
       {items.length === 0 ? (
-        <EmptyCart />
+        <p className="text-gray-500 text-center">Your cart is empty</p>
       ) : (
         <>
           {items.map((item) => (
@@ -89,22 +111,33 @@ export function Cart() {
               onRemoveItem={removeItem}
             />
           ))}
-          
-          <CartActions
-            subtotal={subtotal}
-            discount={discount}
-            discountAmount={discountAmount}
-            total={total}
-            couponCode={couponCode}
-            couponInput={couponInput}
-            isApplyingCoupon={isApplyingCoupon}
-            isProcessing={isProcessing}
-            onCouponInputChange={setCouponInput}
-            onApplyCoupon={handleApplyCoupon}
-            onCheckout={handleCheckout}
-          />
+
+          <div className="mt-6 space-y-4">
+            <CouponForm
+              couponInput={couponInput}
+              isApplyingCoupon={isApplyingCoupon}
+              onCouponInputChange={setCouponInput}
+              onApplyCoupon={handleApplyCoupon}
+            />
+
+            <CartSummary
+              subtotal={subtotal}
+              discount={discount}
+              discountAmount={discountAmount}
+              total={total}
+              couponCode={couponCode}
+            />
+
+            <Button 
+              className="w-full"
+              onClick={createOrder}
+              disabled={isProcessing || items.length === 0}
+            >
+              {isProcessing ? 'Processing...' : 'Place Order'}
+            </Button>
+          </div>
         </>
       )}
-    </CartContainer>
+    </div>
   );
 }

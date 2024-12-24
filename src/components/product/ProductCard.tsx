@@ -2,11 +2,12 @@ import { Product } from '@/types/product';
 import { Button } from '@/components/ui/button';
 import { Plus, Minus } from 'lucide-react';
 
+// Map product names to emojis
 const productEmojis: Record<string, string> = {
   'montgolfiere': '🎈',
   'bois bande premium': '🪵',
   'rails': '🛤️',
-  'tshirt preleveur': '👕',
+  'tshirt preleveur': '👕',  // Changed to lowercase for consistent matching
 };
 
 interface ProductCardProps {
@@ -22,11 +23,12 @@ export function ProductCard({
   onAddToCart, 
   onUpdateQuantity 
 }: ProductCardProps) {
+  // Get emoji based on product name (case-insensitive) or use a default package emoji
   const emoji = productEmojis[product.name.toLowerCase()] || '📦';
 
   return (
-    <div className="flex flex-col items-center bg-card rounded-lg p-1.5 border border-border">
-      <div className="relative w-full aspect-square mb-1 flex items-center justify-center bg-muted rounded-lg">
+    <div className="flex flex-col items-center bg-white rounded-lg p-1.5">
+      <div className="relative w-full aspect-square mb-1 flex items-center justify-center bg-gray-50 rounded-lg">
         <span className="text-6xl">{emoji}</span>
         {product.is_new && (
           <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
@@ -41,10 +43,10 @@ export function ProductCard({
       </div>
       
       <div className="flex flex-col items-center gap-0.5 w-full">
-        <span className="text-sm font-medium text-center text-card-foreground">
+        <span className="text-sm font-medium text-center">
           {product.name}
         </span>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-gray-600">
           {Number(product.price).toFixed(2)} USDT
         </span>
 
