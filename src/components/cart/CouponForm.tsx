@@ -21,13 +21,13 @@ export function CouponForm({
         value={couponInput}
         onChange={(e) => onCouponInputChange(e.target.value)}
         disabled={isApplyingCoupon}
-        className="bg-background dark:bg-secondary text-foreground dark:text-foreground dark:border-border/50"
+        className="bg-white dark:bg-[#161616] text-foreground dark:text-white border-border dark:border-border/10"
       />
       <Button 
         onClick={onApplyCoupon}
         disabled={isApplyingCoupon}
         variant="outline"
-        className="dark:bg-secondary dark:hover:bg-secondary/80 dark:border-border/50"
+        className="dark:bg-[#161616] dark:hover:bg-[#1f1f1f] dark:border-border/10 dark:text-white"
       >
         {isApplyingCoupon ? 'Applying...' : 'Apply'}
       </Button>

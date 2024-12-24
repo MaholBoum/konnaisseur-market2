@@ -96,12 +96,12 @@ export function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-secondary p-4">
-      <div className="max-w-md mx-auto bg-background dark:bg-secondary-900 rounded-lg shadow-lg p-6 border border-border dark:border-border/50">
-        <h2 className="text-2xl font-bold mb-6 text-foreground dark:text-foreground">Your Cart</h2>
+    <div className="min-h-screen bg-background dark:bg-[#000000] p-4">
+      <div className="max-w-md mx-auto bg-white dark:bg-[#1C1C1C] rounded-lg shadow-lg p-6 border border-border dark:border-border/10">
+        <h2 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Your Cart</h2>
         
         {items.length === 0 ? (
-          <p className="text-muted-foreground text-center">Your cart is empty</p>
+          <p className="text-muted-foreground dark:text-gray-400 text-center">Your cart is empty</p>
         ) : (
           <>
             {items.map((item) => (
@@ -130,7 +130,7 @@ export function Cart() {
               />
 
               <Button 
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="w-full bg-[#9b87f5] hover:bg-[#8b77e5] text-white py-6 text-lg"
                 onClick={createOrder}
                 disabled={isProcessing || items.length === 0}
               >
