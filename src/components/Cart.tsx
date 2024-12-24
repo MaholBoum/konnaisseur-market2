@@ -74,13 +74,13 @@ export function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto p-4">
-        <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-          <h2 className="text-2xl font-bold mb-6 text-gray-900">Your Cart</h2>
+        <div className="bg-card rounded-lg shadow-lg p-6 border border-border">
+          <h2 className="text-2xl font-bold mb-6 text-foreground">Your Cart</h2>
           
           {items.length === 0 ? (
-            <p className="text-gray-500 text-center">Your cart is empty</p>
+            <p className="text-muted-foreground text-center">Your cart is empty</p>
           ) : (
             <>
               {items.map((item) => (

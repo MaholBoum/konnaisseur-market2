@@ -10,18 +10,18 @@ interface CartItemProps {
 
 export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps) {
   return (
-    <div className="flex items-center gap-4 py-4 border-b border-gray-200">
+    <div className="flex items-center gap-4 py-4 border-b border-border">
       <img
         src={item.image}
         alt={item.name}
-        className="w-16 h-16 rounded-lg object-cover bg-gray-100"
+        className="w-16 h-16 rounded-lg object-cover bg-muted"
       />
       
       <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-medium text-gray-900 truncate">
+        <h3 className="text-sm font-medium text-foreground truncate">
           {item.name}
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           {item.price.toFixed(2)} USDT
         </p>
       </div>
@@ -36,7 +36,7 @@ export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps
           <Minus className="h-4 w-4" />
         </Button>
         
-        <span className="w-8 text-center text-sm text-gray-900">
+        <span className="w-8 text-center text-sm text-foreground">
           {item.quantity}
         </span>
         
@@ -55,7 +55,7 @@ export function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartItemProps
           className="h-8 w-8"
           onClick={() => onRemoveItem(item.id)}
         >
-          <Trash2 className="h-4 w-4 text-red-500" />
+          <Trash2 className="h-4 w-4 text-destructive" />
         </Button>
       </div>
     </div>
