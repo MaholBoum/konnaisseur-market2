@@ -26,19 +26,21 @@ function App() {
 
   return (
     <ThemeProvider
-      attribute="class"
+      attribute="data-theme"
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
     >
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/order-details" element={<OrderDetails />} />
-          </Routes>
-        </Router>
-      </QueryClientProvider>
+      <div className="min-h-screen bg-background text-foreground">
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/order-details" element={<OrderDetails />} />
+            </Routes>
+          </Router>
+        </QueryClientProvider>
+      </div>
     </ThemeProvider>
   );
 }
