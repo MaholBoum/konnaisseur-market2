@@ -60,11 +60,9 @@ export const OrderSummary = ({
   return (
     <div className="p-4 bg-white rounded-lg shadow-sm m-4">
       <div className="flex items-start gap-4 border-b pb-4">
-        <img
-          src="/lovable-uploads/80299426-225e-4da8-a7ca-fcc09a931f22.png"
-          alt="Konnaisseur Market"
-          className="w-20 h-20 rounded-lg"
-        />
+        <div className="w-20 h-20 flex items-center justify-center text-4xl bg-gray-100 rounded-lg">
+          📦
+        </div>
         <div>
           <h2 className="font-bold text-lg">Order #{orderId}</h2>
           <p className="text-lg">Perfect lunch from Durger King.</p>
