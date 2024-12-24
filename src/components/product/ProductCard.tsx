@@ -2,15 +2,6 @@ import { Product } from '@/types/product';
 import { Button } from '@/components/ui/button';
 import { Plus, Minus } from 'lucide-react';
 
-// Map product categories to emojis
-const categoryEmojis: Record<string, string> = {
-  'food': '🍔',
-  'drink': '🥤',
-  'dessert': '🍰',
-  'snack': '🍿',
-  'default': '📦'
-};
-
 interface ProductCardProps {
   product: Product;
   cartQuantity?: number;
@@ -24,13 +15,14 @@ export function ProductCard({
   onAddToCart, 
   onUpdateQuantity 
 }: ProductCardProps) {
-  // Get emoji based on category or use default
-  const emoji = categoryEmojis[product.category.toLowerCase()] || categoryEmojis.default;
-
   return (
     <div className="flex flex-col items-center bg-white rounded-lg p-1.5">
       <div className="relative w-full aspect-square mb-1 flex items-center justify-center bg-gray-50 rounded-lg">
-        <span className="text-6xl">{emoji}</span>
+        <img 
+          src={product.image} 
+          alt={product.name}
+          className="w-full h-full object-cover rounded-lg"
+        />
         {product.is_new && (
           <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
             NEW
@@ -48,7 +40,7 @@ export function ProductCard({
           {product.name}
         </span>
         <span className="text-sm text-gray-600">
-          {Number(product.price).toFixed(2)} ETH
+          {Number(product.price).toFixed(2)} USDT
         </span>
 
         {!cartQuantity ? (
