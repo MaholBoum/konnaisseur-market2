@@ -74,7 +74,7 @@ export function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#000000]">
+    <div className="min-h-screen bg-background dark:bg-black">
       <div className="max-w-md mx-auto p-4">
         <div className="bg-white dark:bg-[#1C1C1C] rounded-lg shadow-lg p-6 border border-border dark:border-border/10">
           <h2 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Your Cart</h2>
