@@ -1,6 +1,7 @@
 import { CartItem } from '@/types/product';
 import { useEffect, useState } from 'react';
 import { Gauge } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface OrderSummaryProps {
   items: CartItem[];
@@ -9,6 +10,7 @@ interface OrderSummaryProps {
   discountAmount: number;
   total: number;
   orderId: number;
+  phoneNumber?: string;
 }
 
 export const OrderSummary = ({ 
@@ -17,9 +19,11 @@ export const OrderSummary = ({
   discount, 
   discountAmount, 
   total, 
-  orderId 
+  orderId,
+  phoneNumber
 }: OrderSummaryProps) => {
   const [estimatedGas, setEstimatedGas] = useState<number>(0);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Fetch current gas price from Tron network
@@ -42,6 +46,16 @@ export const OrderSummary = ({
 
     fetchGasPrice();
   }, []);
+
+  useEffect(() => {
+    if (phoneNumber) {
+      toast({
+        title: "Order Placed Successfully! 🎉",
+        description: "Thank you for your order! Our team will call you shortly at " + phoneNumber + " to confirm delivery details.",
+        duration: 6000,
+      });
+    }
+  }, [phoneNumber, toast]);
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-sm m-4">
@@ -66,7 +80,7 @@ export const OrderSummary = ({
                 {item.name} x{item.quantity}
               </span>
             </div>
-            <span>{item.price.toFixed(4)} ETH</span>
+            <span>{item.price.toFixed(2)} USDT</span>
           </div>
         ))}
         
@@ -81,17 +95,17 @@ export const OrderSummary = ({
         {discount > 0 && (
           <div className="flex justify-between items-center text-green-600">
             <span>Discount</span>
-            <span>-{discountAmount.toFixed(4)} ETH</span>
+            <span>-{discountAmount.toFixed(2)} USDT</span>
           </div>
         )}
 
         <div className="pt-4 border-t">
           <div className="flex justify-between items-center">
             <span className="text-xl font-bold">Total</span>
-            <span className="text-xl font-bold">{total.toFixed(4)} ETH</span>
+            <span className="text-xl font-bold">{total.toFixed(2)} USDT</span>
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
