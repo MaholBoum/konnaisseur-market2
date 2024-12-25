@@ -44,10 +44,9 @@ export const useWalletConnection = () => {
     try {
       console.log('Authenticating wallet address with Supabase:', address);
       
-      // First try to sign up the user
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: `${address.toLowerCase()}@wallet.auth`,
-        password: `${address}_${Date.now()}`, // Use a unique password
+        password: `${address}_${Date.now()}`,
       });
 
       if (signUpError && !signUpError.message.includes('User already registered')) {
@@ -55,10 +54,9 @@ export const useWalletConnection = () => {
         throw signUpError;
       }
 
-      // If sign up succeeded or user exists, try to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: `${address.toLowerCase()}@wallet.auth`,
-        password: `${address}_${Date.now()}`, // Use the same password format
+        password: `${address}_${Date.now()}`,
       });
 
       if (signInError) {
@@ -76,27 +74,61 @@ export const useWalletConnection = () => {
 
   const connectWallet = async () => {
     try {
-      // Check if TronLink is installed
-      if (!window.tronLink) {
-        toast({
-          title: "TronLink Not Found",
-          description: "Please install TronLink wallet first",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.open('https://www.tronlink.org/', '_blank');
-        }, 1500);
+      const tronWindow = window as TronWindow;
+      
+      // Check if TronLink is available in any form (extension, mobile, or desktop)
+      if (!tronWindow.tronWeb && !tronWindow.tronLink) {
+        console.log('No TronLink detected, showing QR or download options');
+        // Show different options based on platform
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          toast({
+            title: "Open in TronLink Mobile",
+            description: "Please open this page in TronLink Mobile browser",
+            variant: "default",
+          });
+          
+          // Attempt to open in TronLink mobile if installed
+          window.location.href = `tronlinkoutside://version?param=${encodeURIComponent(window.location.href)}`;
+          
+          // Fallback to app store after a short delay
+          setTimeout(() => {
+            const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+            if (isIOS) {
+              window.location.href = 'https://apps.apple.com/us/app/tronlink/id1453530188';
+            } else {
+              window.location.href = 'https://play.google.com/store/apps/details?id=com.tronlinkpro.wallet';
+            }
+          }, 1500);
+        } else {
+          // Desktop without TronLink
+          toast({
+            title: "TronLink Not Found",
+            description: "Please install TronLink wallet first",
+            variant: "destructive",
+          });
+          setTimeout(() => {
+            window.open('https://www.tronlink.org/', '_blank');
+          }, 1500);
+        }
         return;
       }
 
-      // Request account access using TronLink's recommended method
       console.log('Requesting TronLink access...');
-      await window.tronLink.request({ method: 'tron_requestAccounts' });
       
-      // Wait for TronWeb injection with increased timeout and attempts
+      // Try mobile-specific connection first
+      if (tronWindow.tronLink?.tronWeb) {
+        console.log('Using TronLink mobile connection method');
+        await tronWindow.tronLink.request({ method: 'tron_requestAccounts' });
+      } else {
+        // Fallback to extension method
+        console.log('Using TronLink extension connection method');
+        await tronWindow.tronLink?.request({ method: 'tron_requestAccounts' });
+      }
+      
+      // Wait for TronWeb injection
       let attempts = 0;
-      const maxAttempts = 30; // Increased from 20 to 30
-      const interval = 2000; // Increased from 1s to 2s between attempts
+      const maxAttempts = 30;
+      const interval = 2000;
       
       const waitForTronWeb = setInterval(async () => {
         attempts++;
