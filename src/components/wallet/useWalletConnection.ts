@@ -74,6 +74,7 @@ export const useWalletConnection = () => {
 
   const connectWallet = async () => {
     try {
+      console.log('Starting wallet connection process...');
       const tronWindow = window as TronWindow;
       
       // Check if TronLink is available in any form (extension, mobile, or desktop)
@@ -113,16 +114,26 @@ export const useWalletConnection = () => {
         return;
       }
 
-      console.log('Requesting TronLink access...');
+      console.log('TronLink detected, requesting account access...');
       
-      // Try mobile-specific connection first
-      if (tronWindow.tronLink?.tronWeb) {
-        console.log('Using TronLink mobile connection method');
-        await tronWindow.tronLink.request({ method: 'tron_requestAccounts' });
-      } else {
-        // Fallback to extension method
-        console.log('Using TronLink extension connection method');
-        await tronWindow.tronLink?.request({ method: 'tron_requestAccounts' });
+      try {
+        // Try mobile-specific connection first
+        if (tronWindow.tronLink?.tronWeb) {
+          console.log('Using TronLink mobile connection method');
+          await tronWindow.tronLink.request({ method: 'tron_requestAccounts' });
+        } else {
+          // Fallback to extension method
+          console.log('Using TronLink extension connection method');
+          await tronWindow.tronLink?.request({ method: 'tron_requestAccounts' });
+        }
+      } catch (error) {
+        console.error('Error requesting account access:', error);
+        toast({
+          title: "Connection Failed",
+          description: "Failed to connect to TronLink. Please try again.",
+          variant: "destructive",
+        });
+        return;
       }
       
       // Wait for TronWeb injection
@@ -165,7 +176,6 @@ export const useWalletConnection = () => {
             description: "Please make sure TronLink is unlocked and try again",
             variant: "destructive",
           });
-          throw new Error('TronWeb not found after multiple attempts');
         }
       }, interval);
 
