@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { CartItem } from '@/types/product';
-import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 
 interface UsePaymentProcessorProps {
   items: CartItem[];
@@ -27,6 +26,14 @@ export const usePaymentProcessor = ({
   const { toast } = useToast();
 
   const createOrder = async () => {
+    console.log('Creating order...', {
+      subtotal,
+      discountAmount,
+      total,
+      phoneNumber,
+      couponCode
+    });
+
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -45,6 +52,8 @@ export const usePaymentProcessor = ({
       throw new Error('Failed to create order');
     }
 
+    console.log('Order created successfully:', order);
+
     const orderItems = items.map(item => ({
       order_id: order.id,
       product_id: item.id,
@@ -52,6 +61,8 @@ export const usePaymentProcessor = ({
       unit_price: item.price,
       total_price: item.price * item.quantity
     }));
+
+    console.log('Creating order items:', orderItems);
 
     const { error: itemsError } = await supabase
       .from('order_items')
@@ -62,6 +73,7 @@ export const usePaymentProcessor = ({
       throw new Error('Failed to create order items');
     }
 
+    console.log('Order items created successfully');
     return order;
   };
 
@@ -77,7 +89,7 @@ export const usePaymentProcessor = ({
 
     try {
       setIsProcessing(true);
-      console.log('Initiating CryptoBot payment flow...');
+      console.log('Starting payment process...');
       
       // Create the order first
       const order = await createOrder();
@@ -88,15 +100,18 @@ export const usePaymentProcessor = ({
       
       // Open CryptoBot payment interface if in Telegram
       if (window.Telegram?.WebApp) {
+        console.log('Opening CryptoBot payment interface...');
         window.Telegram.WebApp.openInvoice(`ton_${formattedAmount}`);
-      }
-      
-      toast({
-        title: "Success",
-        description: "Order created successfully! Please complete the payment.",
-      });
+        
+        toast({
+          title: "Success",
+          description: "Order created successfully! Please complete the payment.",
+        });
 
-      onSuccess();
+        onSuccess();
+      } else {
+        throw new Error('Telegram WebApp is not initialized');
+      }
       
     } catch (error: any) {
       console.error('Payment error:', error);

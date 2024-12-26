@@ -1,48 +1,41 @@
 import { Button } from '@/components/ui/button';
-import { createPayment } from '@/services/cryptoBot';
 import { useToast } from '@/components/ui/use-toast';
 
 interface PaymentButtonProps {
   total: number;
   isProcessing: boolean;
   onPayment: () => Promise<void>;
-  orderId?: string;
 }
 
-const TON_TO_USD_RATE = 2.5; // Example fixed rate, in production this should come from an API
+const TON_TO_USD_RATE = 2.5;
 
-export const PaymentButton = ({ total, isProcessing, onPayment, orderId }: PaymentButtonProps) => {
+export const PaymentButton = ({ total, isProcessing, onPayment }: PaymentButtonProps) => {
   const { toast } = useToast();
 
   const handlePayment = async () => {
-    if (!orderId) {
-      toast({
-        title: "Error",
-        description: "Order ID is required for payment",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
-      console.log('Converting USD to TON...', { usdAmount: total });
-      const tonAmount = total / TON_TO_USD_RATE;
-      console.log('Initiating Crypto Pay payment...', { tonAmount, orderId });
+      console.log('Starting payment process...', { total });
       
-      const response = await createPayment(tonAmount, orderId);
-      
-      if (response.success && response.paymentUrl) {
-        console.log('Payment URL generated:', response.paymentUrl);
-        window.open(response.paymentUrl, '_blank');
-        await onPayment();
-      } else {
-        console.error('Payment creation failed:', response.error);
+      // Check if we're in Telegram WebApp environment
+      if (!window.Telegram?.WebApp) {
+        console.error('Not in Telegram WebApp environment');
         toast({
-          title: "Payment Error",
-          description: response.error || "Failed to create payment",
+          title: "Error",
+          description: "Please open this app in Telegram",
           variant: "destructive",
         });
+        return;
       }
+
+      // Convert USD to TON
+      const tonAmount = total / TON_TO_USD_RATE;
+      console.log('Converted amount:', { usdAmount: total, tonAmount });
+
+      // Call the parent's payment handler
+      await onPayment();
+      
+      console.log('Payment handler completed successfully');
+      
     } catch (error) {
       console.error('Payment process error:', error);
       toast({
@@ -58,7 +51,7 @@ export const PaymentButton = ({ total, isProcessing, onPayment, orderId }: Payme
       <Button 
         className="w-full bg-purple-500 hover:bg-purple-600 text-white py-6 text-lg rounded-xl"
         onClick={handlePayment}
-        disabled={isProcessing || !orderId}
+        disabled={isProcessing}
       >
         {isProcessing ? 'Processing...' : `Pay ~${(total / TON_TO_USD_RATE).toFixed(2)} TON ($${total.toFixed(2)})`}
       </Button>
