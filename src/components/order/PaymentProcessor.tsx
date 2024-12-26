@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { TronWindow } from '@/components/wallet/types';
 import { supabase } from '@/integrations/supabase/client';
 import { CartItem } from '@/types/product';
-
-// Testnet USDT Contract Address
-const USDT_CONTRACT_ADDRESS = 'TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj';
-const MERCHANT_ADDRESS = 'TTLxUTKUeqYJzE48CCPmJ2tESrnfrTW8XK';
+import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 
 interface UsePaymentProcessorProps {
   items: CartItem[];
@@ -29,8 +25,9 @@ export const usePaymentProcessor = ({
 }: UsePaymentProcessorProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  const { showPayment } = useTelegramWebApp();
 
-  const createOrder = async (transactionHash: string) => {
+  const createOrder = async () => {
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -79,85 +76,20 @@ export const usePaymentProcessor = ({
       return;
     }
 
-    const tronWindow = window as TronWindow;
-    if (!tronWindow.tronWeb) {
-      toast({
-        title: "Error",
-        description: "Please install TronLink to make payments",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       setIsProcessing(true);
+      console.log('Initiating Telegram payment flow...');
       
-      // Check if we're on testnet
-      const network = await tronWindow.tronWeb.fullNode.getNetwork();
-      console.log('Current network:', network);
-      
-      if (!network || network.name !== 'shasta') {
-        toast({
-          title: "Error",
-          description: "Please switch to Shasta Testnet in TronLink",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Create the order first
+      const order = await createOrder();
+      console.log('Order created:', order);
 
-      const address = tronWindow.tronWeb?.defaultAddress?.base58;
-      if (!address) {
-        toast({
-          title: "Error",
-          description: "Please connect your wallet first",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const contract = await tronWindow.tronWeb?.contract().at(USDT_CONTRACT_ADDRESS);
-      if (!contract) {
-        throw new Error('Failed to load USDT contract');
-      }
-
-      const amount = (total * 1e6).toString(); // Convert to USDT decimals (6)
-
-      console.log('Checking allowance...');
-      const allowance = await contract.allowance(address, MERCHANT_ADDRESS).call();
-      const currentAllowance = parseInt(allowance._hex, 16);
-      
-      if (currentAllowance < Number(amount)) {
-        console.log('Approving USDT spend...');
-        const approvalTx = await contract.approve(
-          MERCHANT_ADDRESS,
-          amount
-        ).send();
-        console.log('Approval transaction:', approvalTx);
-        
-        // Wait for approval confirmation
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-
-      console.log('Initiating transfer:', {
-        from: address,
-        to: MERCHANT_ADDRESS,
-        amount: amount,
-        phoneNumber: phoneNumber,
-        network: 'testnet'
-      });
-
-      const transaction = await contract.transfer(
-        MERCHANT_ADDRESS,
-        amount
-      ).send();
-
-      console.log('Transaction hash:', transaction);
-
-      await createOrder(transaction);
+      // Show Telegram's payment interface
+      showPayment();
       
       toast({
         title: "Success",
-        description: "Payment processed successfully!",
+        description: "Order created successfully! Please complete the payment.",
       });
 
       onSuccess();
