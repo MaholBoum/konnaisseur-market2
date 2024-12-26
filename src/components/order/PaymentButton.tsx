@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { useWeb3Modal } from '@web3modal/wagmi';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { useAccount, useBalance, useWriteContract } from 'wagmi';
 import { parseUnits } from 'viem';
 
@@ -22,7 +22,7 @@ export const PaymentButton = ({ total, isProcessing, onPayment }: PaymentButtonP
     token: USDT_CONTRACT as `0x${string}`
   });
 
-  const { writeContract } = useWriteContract();
+  const { writeContract, isPending } = useWriteContract();
 
   const handlePayment = async () => {
     try {
@@ -56,7 +56,6 @@ export const PaymentButton = ({ total, isProcessing, onPayment }: PaymentButtonP
         }],
         functionName: 'transfer',
         args: [MERCHANT_ADDRESS as `0x${string}`, parseUnits(total.toString(), 6)],
-      }, {
         onSuccess: async () => {
           console.log('USDT transfer successful');
           await onPayment();
@@ -97,9 +96,9 @@ export const PaymentButton = ({ total, isProcessing, onPayment }: PaymentButtonP
         <Button 
           className="w-full bg-purple-500 hover:bg-purple-600 text-white py-6 text-lg rounded-xl"
           onClick={handlePayment}
-          disabled={isProcessing}
+          disabled={isProcessing || isPending}
         >
-          {isProcessing ? 'Processing...' : `Pay ${total.toFixed(2)} USDT`}
+          {isProcessing || isPending ? 'Processing...' : `Pay ${total.toFixed(2)} USDT`}
         </Button>
       )}
     </div>

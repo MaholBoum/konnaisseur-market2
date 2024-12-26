@@ -1,6 +1,6 @@
-import { defaultWagmiConfig } from '@web3modal/wagmi'
-import { http } from 'viem'
-import { mainnet } from 'viem/chains'
+import { defaultConfig, createConfig } from 'wagmi'
+import { mainnet } from 'wagmi/chains'
+import { createWeb3Modal } from '@web3modal/wagmi/react'
 
 export const projectId = 'YOUR_WALLET_CONNECT_PROJECT_ID'
 
@@ -11,11 +11,13 @@ const metadata = {
   icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 
-export const config = defaultWagmiConfig({
-  chains: [mainnet],
-  projectId,
-  metadata,
-  transports: {
-    [mainnet.id]: http()
-  }
-})
+export const config = createConfig(
+  defaultConfig({
+    chains: [mainnet],
+    projectId,
+    metadata,
+    ssr: true
+  })
+)
+
+createWeb3Modal({ wagmiConfig: config, projectId, chains: [mainnet] })
