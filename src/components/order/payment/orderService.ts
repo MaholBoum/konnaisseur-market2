@@ -29,6 +29,10 @@ export const createOrder = async ({
     couponCode,
   });
 
+  if (!items.length) {
+    throw new Error('No items provided for order');
+  }
+
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
@@ -68,7 +72,6 @@ export const createOrder = async ({
 
   console.log('Order items created successfully');
 
-  // Create payment request
   const { data: paymentRequest, error: paymentError } = await supabase
     .from('payment_requests')
     .insert({

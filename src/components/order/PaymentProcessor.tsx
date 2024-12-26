@@ -71,10 +71,23 @@ export const usePaymentProcessor = ({
   }, [paymentRequest?.id, onSuccess, toast]);
 
   const processPayment = async () => {
+    console.log('Starting payment process...');
+    
     if (!phoneNumber.trim()) {
+      console.log('Phone number missing');
       toast({
         title: "Error",
         description: "Please enter your phone number for delivery coordination",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (items.length === 0) {
+      console.log('No items in cart');
+      toast({
+        title: "Error",
+        description: "Your cart is empty",
         variant: "destructive",
       });
       return;
@@ -84,7 +97,7 @@ export const usePaymentProcessor = ({
       setIsProcessing(true);
       console.log('Processing payment with items:', items);
       
-      const { paymentRequest: newPaymentRequest } = await createOrder({
+      const { order, paymentRequest: newPaymentRequest } = await createOrder({
         items,
         subtotal,
         discountAmount,
@@ -93,7 +106,9 @@ export const usePaymentProcessor = ({
         couponCode,
       });
 
+      console.log('Order created:', order);
       console.log('Payment request created:', newPaymentRequest);
+      
       setPaymentRequest(newPaymentRequest);
       
       toast({

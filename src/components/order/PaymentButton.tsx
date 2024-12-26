@@ -21,6 +21,8 @@ export const PaymentButton = ({
   const { toast } = useToast();
   const { paymentRequest: monitoredPayment } = usePaymentMonitor(paymentRequest?.id);
 
+  console.log('PaymentButton rendered with:', { total, isProcessing, paymentRequest });
+
   const copyAddress = async () => {
     if (paymentRequest?.wallet_address) {
       try {
@@ -42,6 +44,8 @@ export const PaymentButton = ({
   if (paymentRequest) {
     const status = monitoredPayment?.status || paymentRequest.status;
     const isExpired = monitoredPayment?.expiry && new Date(monitoredPayment.expiry) < new Date();
+
+    console.log('Payment request status:', status);
 
     return (
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
