@@ -8,11 +8,12 @@ interface PaymentButtonProps {
 }
 
 export const PaymentButton = ({ total, isProcessing, onPayment }: PaymentButtonProps) => {
-  const { showPayment } = useTelegramWebApp();
-
   const handlePayment = async () => {
-    console.log('Initiating Telegram payment...');
-    showPayment();
+    console.log('Initiating CryptoBot payment...');
+    if (window.Telegram?.WebApp) {
+      const formattedAmount = total.toFixed(2);
+      window.Telegram.WebApp.openInvoice(`ton_${formattedAmount}`);
+    }
     await onPayment();
   };
 

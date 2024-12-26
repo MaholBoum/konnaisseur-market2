@@ -25,7 +25,6 @@ export const usePaymentProcessor = ({
 }: UsePaymentProcessorProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const { showPayment } = useTelegramWebApp();
 
   const createOrder = async () => {
     const { data: order, error: orderError } = await supabase
@@ -78,14 +77,19 @@ export const usePaymentProcessor = ({
 
     try {
       setIsProcessing(true);
-      console.log('Initiating Telegram payment flow...');
+      console.log('Initiating CryptoBot payment flow...');
       
       // Create the order first
       const order = await createOrder();
       console.log('Order created:', order);
 
-      // Show Telegram's payment interface
-      showPayment();
+      // Format amount for CryptoBot (2 decimal places)
+      const formattedAmount = total.toFixed(2);
+      
+      // Open CryptoBot payment interface if in Telegram
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.openInvoice(`ton_${formattedAmount}`);
+      }
       
       toast({
         title: "Success",
