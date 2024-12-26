@@ -1,6 +1,5 @@
 import { CartItem } from '@/types/product';
-import { useEffect, useState } from 'react';
-import { Gauge } from 'lucide-react';
+import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 interface OrderSummaryProps {
@@ -22,30 +21,7 @@ export const OrderSummary = ({
   orderId,
   phoneNumber
 }: OrderSummaryProps) => {
-  const [estimatedGas, setEstimatedGas] = useState<number>(0);
   const { toast } = useToast();
-
-  useEffect(() => {
-    // Fetch current gas price from Tron network
-    const fetchGasPrice = async () => {
-      try {
-        const tronWeb = (window as any).tronWeb;
-        if (tronWeb) {
-          const currentBlock = await tronWeb.trx.getCurrentBlock();
-          const gasPrice = 420; // Base gas price in SUN
-          const gasLimit = 150000; // Standard gas limit for token transfers
-          const estimatedFeeInSun = gasPrice * gasLimit;
-          const estimatedFeeInTrx = estimatedFeeInSun / 1_000_000; // Convert to TRX
-          setEstimatedGas(estimatedFeeInTrx);
-        }
-      } catch (error) {
-        console.error('Error fetching gas price:', error);
-        setEstimatedGas(0.1); // Fallback value
-      }
-    };
-
-    fetchGasPrice();
-  }, []);
 
   useEffect(() => {
     if (phoneNumber) {
@@ -81,14 +57,6 @@ export const OrderSummary = ({
             <span>{item.price.toFixed(2)} USDT</span>
           </div>
         ))}
-        
-        <div className="flex justify-between items-center text-gray-500">
-          <div className="flex items-center gap-2">
-            <Gauge className="h-4 w-4" />
-            <span>Network Fee (Gas)</span>
-          </div>
-          <span>~{estimatedGas.toFixed(4)} TRX</span>
-        </div>
 
         {discount > 0 && (
           <div className="flex justify-between items-center text-green-600">
