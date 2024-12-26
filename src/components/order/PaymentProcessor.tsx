@@ -71,7 +71,14 @@ export const usePaymentProcessor = ({
   }, [paymentRequest?.id, onSuccess, toast]);
 
   const processPayment = async () => {
-    console.log('Starting payment process...');
+    console.log('Starting payment process with data:', {
+      items,
+      subtotal,
+      discountAmount,
+      total,
+      phoneNumber,
+      couponCode
+    });
     
     if (!phoneNumber.trim()) {
       console.log('Phone number missing');
@@ -95,7 +102,7 @@ export const usePaymentProcessor = ({
 
     try {
       setIsProcessing(true);
-      console.log('Processing payment with items:', items);
+      console.log('Creating order and payment request...');
       
       const { order, paymentRequest: newPaymentRequest } = await createOrder({
         items,
@@ -106,8 +113,8 @@ export const usePaymentProcessor = ({
         couponCode,
       });
 
-      console.log('Order created:', order);
-      console.log('Payment request created:', newPaymentRequest);
+      console.log('Order created successfully:', order);
+      console.log('Payment request created successfully:', newPaymentRequest);
       
       setPaymentRequest(newPaymentRequest);
       
@@ -117,7 +124,8 @@ export const usePaymentProcessor = ({
       });
       
     } catch (error: any) {
-      console.error('Payment error:', error);
+      console.error('Payment processing error:', error);
+      setIsProcessing(false);
       toast({
         title: "Error",
         description: error.message || "Payment failed. Please try again.",

@@ -30,9 +30,12 @@ export const createOrder = async ({
   });
 
   if (!items.length) {
+    console.error('No items provided for order');
     throw new Error('No items provided for order');
   }
 
+  // Create order
+  console.log('Creating order record...');
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
@@ -48,11 +51,13 @@ export const createOrder = async ({
 
   if (orderError) {
     console.error('Error creating order:', orderError);
-    throw new Error('Failed to create order');
+    throw new Error('Failed to create order: ' + orderError.message);
   }
 
   console.log('Order created successfully:', order);
 
+  // Create order items
+  console.log('Creating order items...');
   const orderItems = items.map(item => ({
     order_id: order.id,
     product_id: item.id,
@@ -67,11 +72,13 @@ export const createOrder = async ({
 
   if (itemsError) {
     console.error('Error creating order items:', itemsError);
-    throw new Error('Failed to create order items');
+    throw new Error('Failed to create order items: ' + itemsError.message);
   }
 
   console.log('Order items created successfully');
 
+  // Create payment request
+  console.log('Creating payment request...');
   const { data: paymentRequest, error: paymentError } = await supabase
     .from('payment_requests')
     .insert({
@@ -85,7 +92,7 @@ export const createOrder = async ({
 
   if (paymentError) {
     console.error('Error creating payment request:', paymentError);
-    throw new Error('Failed to create payment request');
+    throw new Error('Failed to create payment request: ' + paymentError.message);
   }
 
   console.log('Payment request created successfully:', paymentRequest);
