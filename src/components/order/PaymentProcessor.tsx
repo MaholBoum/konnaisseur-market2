@@ -94,24 +94,13 @@ export const usePaymentProcessor = ({
       // Create the order first
       const order = await createOrder();
       console.log('Order created:', order);
-
-      // Format amount for CryptoBot (2 decimal places)
-      const formattedAmount = total.toFixed(2);
       
-      // Open CryptoBot payment interface if in Telegram
-      if (window.Telegram?.WebApp) {
-        console.log('Opening CryptoBot payment interface...');
-        window.Telegram.WebApp.openInvoice(`ton_${formattedAmount}`);
-        
-        toast({
-          title: "Success",
-          description: "Order created successfully! Please complete the payment.",
-        });
+      toast({
+        title: "Success",
+        description: "Order created successfully!",
+      });
 
-        onSuccess();
-      } else {
-        throw new Error('Telegram WebApp is not initialized');
-      }
+      onSuccess();
       
     } catch (error: any) {
       console.error('Payment error:', error);
