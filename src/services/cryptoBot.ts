@@ -1,5 +1,4 @@
 const CRYPTO_PAY_API_URL = 'https://pay.crypt.bot/api';
-const API_TOKEN = 'YOUR_CRYPTO_PAY_TOKEN'; // Replace with your token from @CryptoBot
 
 interface CreateInvoiceResponse {
   ok: boolean;
@@ -27,7 +26,7 @@ export const createPayment = async (amount: number, orderId: string): Promise<Cr
     const response = await fetch(`${CRYPTO_PAY_API_URL}/createInvoice`, {
       method: 'POST',
       headers: {
-        'Crypto-Pay-API-Token': API_TOKEN,
+        'Crypto-Pay-API-Token': process.env.CRYPTO_PAY_TOKEN || '',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -66,7 +65,7 @@ export const checkPaymentStatus = async (invoiceId: string): Promise<boolean> =>
     const response = await fetch(`${CRYPTO_PAY_API_URL}/getInvoice`, {
       method: 'POST',
       headers: {
-        'Crypto-Pay-API-Token': API_TOKEN,
+        'Crypto-Pay-API-Token': process.env.CRYPTO_PAY_TOKEN || '',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
