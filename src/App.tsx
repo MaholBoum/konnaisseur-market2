@@ -15,20 +15,6 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  // Check if running in Telegram WebApp
-  const isTelegramWebApp = Boolean(window.Telegram?.WebApp);
-
-  if (!isTelegramWebApp) {
-    return (
-      <div className="flex items-center justify-center min-h-screen p-4 text-center">
-        <div>
-          <h1 className="text-xl font-bold mb-2">Telegram Mini App</h1>
-          <p>Please open this application in Telegram.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
