@@ -9,6 +9,7 @@ declare global {
         ready: () => void;
         expand: () => void;
         showPaymentModal: () => void;
+        openInvoice: (invoiceId: string, options?: { callback?: (status: string) => void }) => void;
       };
     };
   }
