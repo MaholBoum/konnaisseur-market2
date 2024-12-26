@@ -84,7 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         from: 'Konnaisseur Market <orders@resend.dev>',
-        to: ['your-email@example.com'], // Replace with your email
+        to: ['konnaisseur@protonmail.com'],
         subject: `New Order #${order.id} - ${order.final_amount} USDT`,
         html: emailHtml,
       }),
