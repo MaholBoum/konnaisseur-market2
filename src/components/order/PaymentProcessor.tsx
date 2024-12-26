@@ -31,6 +31,7 @@ export const usePaymentProcessor = ({
   useEffect(() => {
     if (!paymentRequest?.id) return;
 
+    console.log('Starting payment status polling for:', paymentRequest.id);
     const interval = setInterval(async () => {
       try {
         console.log('Checking payment status for:', paymentRequest.id);
@@ -42,6 +43,11 @@ export const usePaymentProcessor = ({
 
         if (error) {
           console.error('Error checking payment status:', error);
+          toast({
+            title: "Error",
+            description: "Failed to check payment status. Please try again.",
+            variant: "destructive",
+          });
           return;
         }
 
@@ -61,9 +67,15 @@ export const usePaymentProcessor = ({
             description: "There was an error processing your payment. Please try again.",
             variant: "destructive",
           });
+          setIsProcessing(false);
         }
       } catch (error) {
         console.error('Error in payment status polling:', error);
+        toast({
+          title: "Error",
+          description: "Failed to check payment status. Please try again.",
+          variant: "destructive",
+        });
       }
     }, 10000); // Poll every 10 seconds
 
@@ -131,8 +143,6 @@ export const usePaymentProcessor = ({
         description: error.message || "Payment failed. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsProcessing(false);
     }
   };
 

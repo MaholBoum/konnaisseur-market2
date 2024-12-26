@@ -85,7 +85,8 @@ export const createOrder = async ({
       order_id: order.id,
       amount: total,
       wallet_address: MERCHANT_ADDRESS,
-      status: 'pending'
+      status: 'pending',
+      expiry: new Date(Date.now() + 60 * 60 * 1000).toISOString() // 1 hour expiry
     })
     .select()
     .single();
