@@ -1,17 +1,25 @@
 import { Button } from '@/components/ui/button';
 import { Wallet } from 'lucide-react';
-import { useTelegramWebApp } from '../hooks/useTelegramWebApp';
+import { createPayment } from '@/services/cryptoBot';
+import { useToast } from '@/components/ui/use-toast';
 
 export function WalletConnect() {
-  const { isInitialized, initData, showPayment } = useTelegramWebApp();
+  const { toast } = useToast();
 
-  const handlePaymentClick = () => {
+  const handlePaymentClick = async () => {
     console.log('Opening CryptoBot payment interface...');
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.openInvoice('ton_1.00'); // Example 1 TON payment
+    
+    // Create a test payment for 1 TON
+    const response = await createPayment(1, 'test-payment');
+    
+    if (response.success && response.paymentUrl) {
+      window.open(response.paymentUrl, '_blank');
     } else {
-      console.log('Telegram WebApp not available, showing alternative payment UI');
-      showPayment();
+      toast({
+        title: "Payment Error",
+        description: response.error || "Failed to create payment",
+        variant: "destructive",
+      });
     }
   };
 
