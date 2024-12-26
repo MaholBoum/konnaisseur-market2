@@ -38,8 +38,9 @@ export const usePaymentProcessor = ({
 
     try {
       setIsProcessing(true);
+      console.log('Creating order with items:', items);
       
-      const { paymentRequest: newPaymentRequest } = await createOrder({
+      const { order, paymentRequest: newPaymentRequest } = await createOrder({
         items,
         subtotal,
         discountAmount,
@@ -48,6 +49,9 @@ export const usePaymentProcessor = ({
         couponCode,
       });
 
+      console.log('Order created:', order);
+      console.log('Payment request created:', newPaymentRequest);
+      
       setPaymentRequest(newPaymentRequest);
       
       toast({

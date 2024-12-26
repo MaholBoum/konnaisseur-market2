@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { CartItem } from '@/types/product';
 
-const MERCHANT_ADDRESS = 'TVunEifCFGSS6MCiRzB3X3CyAMGJnHt2KT'; // Updated merchant address
+const MERCHANT_ADDRESS = 'TVunEifCFGSS6MCiRzB3X3CyAMGJnHt2KT';
 
 interface CreateOrderParams {
   items: CartItem[];
@@ -20,6 +20,15 @@ export const createOrder = async ({
   phoneNumber,
   couponCode,
 }: CreateOrderParams) => {
+  console.log('Creating order with params:', {
+    items,
+    subtotal,
+    discountAmount,
+    total,
+    phoneNumber,
+    couponCode,
+  });
+
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
@@ -38,6 +47,8 @@ export const createOrder = async ({
     throw new Error('Failed to create order');
   }
 
+  console.log('Order created successfully:', order);
+
   const orderItems = items.map(item => ({
     order_id: order.id,
     product_id: item.id,
@@ -55,13 +66,15 @@ export const createOrder = async ({
     throw new Error('Failed to create order items');
   }
 
-  // Create payment request with updated merchant wallet address
+  console.log('Order items created successfully');
+
+  // Create payment request
   const { data: paymentRequest, error: paymentError } = await supabase
     .from('payment_requests')
     .insert({
       order_id: order.id,
       amount: total,
-      wallet_address: MERCHANT_ADDRESS, // Updated merchant wallet address
+      wallet_address: MERCHANT_ADDRESS,
       status: 'pending'
     })
     .select()
@@ -71,6 +84,8 @@ export const createOrder = async ({
     console.error('Error creating payment request:', paymentError);
     throw new Error('Failed to create payment request');
   }
+
+  console.log('Payment request created successfully:', paymentRequest);
 
   return { order, paymentRequest };
 };
