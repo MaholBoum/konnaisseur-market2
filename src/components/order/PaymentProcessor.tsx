@@ -32,24 +32,35 @@ export const usePaymentProcessor = ({
     if (!paymentRequest?.id) return;
 
     const interval = setInterval(async () => {
-      const { data, error } = await supabase
-        .from('payment_requests')
-        .select('status')
-        .eq('id', paymentRequest.id)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('payment_requests')
+          .select('status')
+          .eq('id', paymentRequest.id)
+          .single();
 
-      if (error) {
-        console.error('Error checking payment status:', error);
-        return;
-      }
+        if (error) {
+          console.error('Error checking payment status:', error);
+          return;
+        }
 
-      if (data.status === 'completed') {
-        clearInterval(interval);
-        toast({
-          title: "Payment Confirmed!",
-          description: "Your payment has been confirmed and your order is being processed.",
-        });
-        onSuccess();
+        if (data.status === 'completed') {
+          clearInterval(interval);
+          toast({
+            title: "Payment Confirmed!",
+            description: "Your payment has been confirmed and your order is being processed.",
+          });
+          onSuccess();
+        } else if (data.status === 'error') {
+          clearInterval(interval);
+          toast({
+            title: "Payment Failed",
+            description: "There was an error processing your payment. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('Error in payment status polling:', error);
       }
     }, 30000); // Poll every 30 seconds
 
