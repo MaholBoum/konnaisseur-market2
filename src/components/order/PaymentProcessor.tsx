@@ -1,12 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { TronWindow } from '@/components/wallet/types';
 import { supabase } from '@/integrations/supabase/client';
 import { CartItem } from '@/types/product';
-
-// Testnet USDT Contract Address
-const USDT_CONTRACT_ADDRESS = 'TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj';
-const MERCHANT_ADDRESS = 'TTLxUTKUeqYJzE48CCPmJ2tESrnfrTW8XK';
+import { createOrder } from './payment/orderService';
 
 interface UsePaymentProcessorProps {
   items: CartItem[];
@@ -28,46 +24,37 @@ export const usePaymentProcessor = ({
   onSuccess
 }: UsePaymentProcessorProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentRequest, setPaymentRequest] = useState<any>(null);
   const { toast } = useToast();
 
-  const createOrder = async (transactionHash: string) => {
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .insert({
-        total_amount: subtotal,
-        discount_amount: discountAmount,
-        final_amount: total,
-        coupon_code: couponCode,
-        phone_number: phoneNumber,
-        status: 'pending'
-      })
-      .select()
-      .single();
+  // Poll payment status
+  useEffect(() => {
+    if (!paymentRequest?.id) return;
 
-    if (orderError) {
-      console.error('Error creating order:', orderError);
-      throw new Error('Failed to create order');
-    }
+    const interval = setInterval(async () => {
+      const { data, error } = await supabase
+        .from('payment_requests')
+        .select('status')
+        .eq('id', paymentRequest.id)
+        .single();
 
-    const orderItems = items.map(item => ({
-      order_id: order.id,
-      product_id: item.id,
-      quantity: item.quantity,
-      unit_price: item.price,
-      total_price: item.price * item.quantity
-    }));
+      if (error) {
+        console.error('Error checking payment status:', error);
+        return;
+      }
 
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems);
+      if (data.status === 'completed') {
+        clearInterval(interval);
+        toast({
+          title: "Payment Confirmed!",
+          description: "Your payment has been confirmed and your order is being processed.",
+        });
+        onSuccess();
+      }
+    }, 30000); // Poll every 30 seconds
 
-    if (itemsError) {
-      console.error('Error creating order items:', itemsError);
-      throw new Error('Failed to create order items');
-    }
-
-    return order;
-  };
+    return () => clearInterval(interval);
+  }, [paymentRequest?.id, onSuccess, toast]);
 
   const processPayment = async () => {
     if (!phoneNumber.trim()) {
@@ -79,88 +66,24 @@ export const usePaymentProcessor = ({
       return;
     }
 
-    const tronWindow = window as TronWindow;
-    if (!tronWindow.tronWeb) {
-      toast({
-        title: "Error",
-        description: "Please install TronLink to make payments",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       setIsProcessing(true);
       
-      // Check if we're on testnet
-      const network = await tronWindow.tronWeb.fullNode.getNetwork();
-      console.log('Current network:', network);
-      
-      if (!network || network.name !== 'shasta') {
-        toast({
-          title: "Error",
-          description: "Please switch to Shasta Testnet in TronLink",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const address = tronWindow.tronWeb?.defaultAddress?.base58;
-      if (!address) {
-        toast({
-          title: "Error",
-          description: "Please connect your wallet first",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const contract = await tronWindow.tronWeb?.contract().at(USDT_CONTRACT_ADDRESS);
-      if (!contract) {
-        throw new Error('Failed to load USDT contract');
-      }
-
-      const amount = (total * 1e6).toString(); // Convert to USDT decimals (6)
-
-      console.log('Checking allowance...');
-      const allowance = await contract.allowance(address, MERCHANT_ADDRESS).call();
-      const currentAllowance = parseInt(allowance._hex, 16);
-      
-      if (currentAllowance < Number(amount)) {
-        console.log('Approving USDT spend...');
-        const approvalTx = await contract.approve(
-          MERCHANT_ADDRESS,
-          amount
-        ).send();
-        console.log('Approval transaction:', approvalTx);
-        
-        // Wait for approval confirmation
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-
-      console.log('Initiating transfer:', {
-        from: address,
-        to: MERCHANT_ADDRESS,
-        amount: amount,
-        phoneNumber: phoneNumber,
-        network: 'testnet'
+      const { paymentRequest: newPaymentRequest } = await createOrder({
+        items,
+        subtotal,
+        discountAmount,
+        total,
+        phoneNumber,
+        couponCode,
       });
 
-      const transaction = await contract.transfer(
-        MERCHANT_ADDRESS,
-        amount
-      ).send();
-
-      console.log('Transaction hash:', transaction);
-
-      await createOrder(transaction);
+      setPaymentRequest(newPaymentRequest);
       
       toast({
-        title: "Success",
-        description: "Payment processed successfully!",
+        title: "Order Created",
+        description: "Please send the exact amount of USDT to the provided wallet address.",
       });
-
-      onSuccess();
       
     } catch (error: any) {
       console.error('Payment error:', error);
@@ -174,5 +97,5 @@ export const usePaymentProcessor = ({
     }
   };
 
-  return { processPayment, isProcessing };
+  return { processPayment, isProcessing, paymentRequest };
 };

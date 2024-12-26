@@ -8,7 +8,6 @@ interface CreateOrderParams {
   total: number;
   phoneNumber: string;
   couponCode: string | null;
-  transactionHash: string;
 }
 
 export const createOrder = async ({
@@ -18,7 +17,6 @@ export const createOrder = async ({
   total,
   phoneNumber,
   couponCode,
-  transactionHash
 }: CreateOrderParams) => {
   const { data: order, error: orderError } = await supabase
     .from('orders')
@@ -55,5 +53,22 @@ export const createOrder = async ({
     throw new Error('Failed to create order items');
   }
 
-  return order;
+  // Create payment request
+  const { data: paymentRequest, error: paymentError } = await supabase
+    .from('payment_requests')
+    .insert({
+      order_id: order.id,
+      amount: total,
+      wallet_address: 'TTLxUTKUeqYJzE48CCPmJ2tESrnfrTW8XK', // Merchant wallet address
+      status: 'pending'
+    })
+    .select()
+    .single();
+
+  if (paymentError) {
+    console.error('Error creating payment request:', paymentError);
+    throw new Error('Failed to create payment request');
+  }
+
+  return { order, paymentRequest };
 };
