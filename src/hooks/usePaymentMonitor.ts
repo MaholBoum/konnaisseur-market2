@@ -10,6 +10,8 @@ interface PaymentRequest {
   confirmed_at: string | null;
   webhook_url: string | null;
   retry_count: number;
+  expiry: string | null;
+  wallet_address: string;
 }
 
 export const usePaymentMonitor = (paymentRequestId: string | null) => {
