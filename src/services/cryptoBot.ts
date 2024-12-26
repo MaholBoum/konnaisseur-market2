@@ -40,6 +40,10 @@ export const createPayment = async (amount: number, orderId: string): Promise<Cr
       })
     });
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const data: CreateInvoiceResponse = await response.json();
     console.log('Crypto Pay API response:', data);
 
@@ -72,6 +76,10 @@ export const checkPaymentStatus = async (invoiceId: string): Promise<boolean> =>
         invoice_id: invoiceId
       })
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     const data = await response.json();
     return data.ok && data.result?.status === 'paid';
