@@ -1,29 +1,18 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Index from './pages/Index';
+import { BrowserRouter } from 'react-router-dom';
+import { Web3Provider } from './components/providers/Web3Provider';
+import { Toaster } from './components/ui/toaster';
+import { Cart } from './components/Cart';
 import OrderDetails from './pages/OrderDetails';
-import './App.css';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      retry: 1,
-    },
-  },
-});
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/order-details" element={<OrderDetails />} />
-        </Routes>
-      </Router>
-    </QueryClientProvider>
+    <Web3Provider>
+      <BrowserRouter>
+        <Cart />
+        <OrderDetails />
+      </BrowserRouter>
+      <Toaster />
+    </Web3Provider>
   );
 }
 

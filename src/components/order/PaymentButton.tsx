@@ -1,5 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useAccount, useBalance, useContractWrite } from 'wagmi';
+import { parseUnits } from 'viem';
+
+const USDT_CONTRACT = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
+const MERCHANT_ADDRESS = '0xYourMerchantAddress'; // Replace with your wallet address
 
 interface PaymentButtonProps {
   total: number;
@@ -7,40 +13,72 @@ interface PaymentButtonProps {
   onPayment: () => Promise<void>;
 }
 
-const TON_TO_USD_RATE = 2.5;
-
 export const PaymentButton = ({ total, isProcessing, onPayment }: PaymentButtonProps) => {
   const { toast } = useToast();
+  const { open } = useWeb3Modal();
+  const { address, isConnected } = useAccount();
+  const { data: balance } = useBalance({
+    address,
+    token: USDT_CONTRACT,
+  });
+
+  const { write: transferUSDT } = useContractWrite({
+    address: USDT_CONTRACT,
+    abi: [{
+      constant: false,
+      inputs: [
+        { name: '_to', type: 'address' },
+        { name: '_value', type: 'uint256' },
+      ],
+      name: 'transfer',
+      outputs: [{ name: '', type: 'bool' }],
+      type: 'function',
+    }],
+    functionName: 'transfer',
+  });
 
   const handlePayment = async () => {
     try {
-      console.log('Starting payment process...', { total });
-      
-      // Check if we're in Telegram WebApp environment
-      if (!window.Telegram?.WebApp) {
-        console.error('Not in Telegram WebApp environment');
+      if (!isConnected) {
+        await open();
+        return;
+      }
+
+      if (!balance || balance.value < parseUnits(total.toString(), 6)) {
         toast({
-          title: "Error",
-          description: "Please open this app in Telegram",
+          title: "Insufficient USDT balance",
+          description: "Please make sure you have enough USDT in your wallet",
           variant: "destructive",
         });
         return;
       }
 
-      // Convert USD to TON
-      const tonAmount = total / TON_TO_USD_RATE;
-      console.log('Converted amount:', { usdAmount: total, tonAmount });
+      console.log('Starting USDT transfer...', { total, address });
 
-      // Call the parent's payment handler
-      await onPayment();
-      
-      console.log('Payment handler completed successfully');
-      
+      transferUSDT({
+        args: [MERCHANT_ADDRESS, parseUnits(total.toString(), 6)],
+        onSuccess: async () => {
+          console.log('USDT transfer successful');
+          await onPayment();
+          toast({
+            title: "Payment Successful",
+            description: "Your order has been placed successfully!",
+          });
+        },
+        onError: (error) => {
+          console.error('USDT transfer failed:', error);
+          toast({
+            title: "Payment Failed",
+            description: "There was an error processing your payment. Please try again.",
+            variant: "destructive",
+          });
+        },
+      });
     } catch (error) {
       console.error('Payment process error:', error);
       toast({
-        title: "Payment Error",
-        description: "An unexpected error occurred while processing payment",
+        title: "Error",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
     }
@@ -48,13 +86,22 @@ export const PaymentButton = ({ total, isProcessing, onPayment }: PaymentButtonP
 
   return (
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
-      <Button 
-        className="w-full bg-purple-500 hover:bg-purple-600 text-white py-6 text-lg rounded-xl"
-        onClick={handlePayment}
-        disabled={isProcessing}
-      >
-        {isProcessing ? 'Processing...' : `Pay ~${(total / TON_TO_USD_RATE).toFixed(2)} TON ($${total.toFixed(2)})`}
-      </Button>
+      {!isConnected ? (
+        <Button 
+          className="w-full bg-purple-500 hover:bg-purple-600 text-white py-6 text-lg rounded-xl"
+          onClick={() => open()}
+        >
+          Connect Wallet
+        </Button>
+      ) : (
+        <Button 
+          className="w-full bg-purple-500 hover:bg-purple-600 text-white py-6 text-lg rounded-xl"
+          onClick={handlePayment}
+          disabled={isProcessing}
+        >
+          {isProcessing ? 'Processing...' : `Pay ${total.toFixed(2)} USDT`}
+        </Button>
+      )}
     </div>
   );
 };
