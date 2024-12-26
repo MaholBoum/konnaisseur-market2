@@ -33,9 +33,10 @@ export const usePaymentProcessor = ({
 
     const interval = setInterval(async () => {
       try {
+        console.log('Checking payment status for:', paymentRequest.id);
         const { data, error } = await supabase
           .from('payment_requests')
-          .select('status')
+          .select('status, transaction_hash, confirmed_at')
           .eq('id', paymentRequest.id)
           .single();
 
@@ -43,6 +44,8 @@ export const usePaymentProcessor = ({
           console.error('Error checking payment status:', error);
           return;
         }
+
+        console.log('Payment status update:', data);
 
         if (data.status === 'completed') {
           clearInterval(interval);
@@ -62,7 +65,7 @@ export const usePaymentProcessor = ({
       } catch (error) {
         console.error('Error in payment status polling:', error);
       }
-    }, 30000); // Poll every 30 seconds
+    }, 10000); // Poll every 10 seconds
 
     return () => clearInterval(interval);
   }, [paymentRequest?.id, onSuccess, toast]);
@@ -79,6 +82,7 @@ export const usePaymentProcessor = ({
 
     try {
       setIsProcessing(true);
+      console.log('Processing payment with items:', items);
       
       const { paymentRequest: newPaymentRequest } = await createOrder({
         items,
@@ -89,6 +93,7 @@ export const usePaymentProcessor = ({
         couponCode,
       });
 
+      console.log('Payment request created:', newPaymentRequest);
       setPaymentRequest(newPaymentRequest);
       
       toast({

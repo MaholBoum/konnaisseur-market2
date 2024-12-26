@@ -3,6 +3,7 @@ import { Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { QRCodeSVG } from 'qrcode.react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { usePaymentMonitor } from '@/hooks/usePaymentMonitor';
 
 interface PaymentButtonProps {
   total: number;
@@ -18,6 +19,7 @@ export const PaymentButton = ({
   paymentRequest 
 }: PaymentButtonProps) => {
   const { toast } = useToast();
+  const { paymentRequest: monitoredPayment } = usePaymentMonitor(paymentRequest?.id);
 
   const copyAddress = async () => {
     if (paymentRequest?.wallet_address) {
@@ -38,13 +40,24 @@ export const PaymentButton = ({
   };
 
   if (paymentRequest) {
+    const status = monitoredPayment?.status || paymentRequest.status;
+    const isExpired = monitoredPayment?.expiry && new Date(monitoredPayment.expiry) < new Date();
+
     return (
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
         <div className="max-w-md mx-auto space-y-4">
-          {paymentRequest.status === 'error' && (
+          {status === 'error' && (
             <Alert variant="destructive">
               <AlertDescription>
                 There was an error processing your payment. Please try again or contact support.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {isExpired && (
+            <Alert variant="destructive">
+              <AlertDescription>
+                This payment request has expired. Please create a new one.
               </AlertDescription>
             </Alert>
           )}
@@ -70,13 +83,19 @@ export const PaymentButton = ({
           </div>
           
           <p className="text-sm text-center text-gray-500">
-            {paymentRequest.status === 'pending' 
+            {status === 'pending' 
               ? 'Waiting for payment confirmation...'
-              : paymentRequest.status === 'completed'
+              : status === 'completed'
               ? 'Payment confirmed!'
               : 'Payment status unknown'
             }
           </p>
+
+          {monitoredPayment?.transaction_hash && (
+            <p className="text-xs text-center text-gray-400 break-all">
+              Transaction: {monitoredPayment.transaction_hash}
+            </p>
+          )}
         </div>
       </div>
     );
