@@ -23,6 +23,7 @@ export function ProductCard({
   onAddToCart, 
   onUpdateQuantity 
 }: ProductCardProps) {
+  // Get emoji based on product name (case-insensitive) or use a default package emoji
   const emoji = productEmojis[product.name.toLowerCase()] || '📦';
 
   return (
@@ -46,7 +47,7 @@ export function ProductCard({
           {product.name}
         </span>
         <span className="text-sm text-gray-600">
-          ${Number(product.price).toFixed(2)}
+          {Number(product.price).toFixed(2)} USDT
         </span>
 
         {!cartQuantity ? (
