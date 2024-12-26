@@ -7,7 +7,7 @@ export function WalletConnect() {
   const { toast } = useToast();
 
   const handlePaymentClick = async () => {
-    console.log('Opening CryptoBot payment interface...');
+    console.log('Opening Crypto Pay payment interface...');
     
     // Create a test payment for 1 TON
     const response = await createPayment(1, 'test-payment');

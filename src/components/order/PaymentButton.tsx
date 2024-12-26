@@ -22,7 +22,7 @@ export const PaymentButton = ({ total, isProcessing, onPayment, orderId }: Payme
       return;
     }
 
-    console.log('Initiating CryptoBot payment...', { total, orderId });
+    console.log('Initiating Crypto Pay payment...', { total, orderId });
     
     const response = await createPayment(total, orderId);
     
