@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { CartItem } from '@/types/product';
 
+const MERCHANT_ADDRESS = 'TVunEifCFGSS6MCiRzB3X3CyAMGJnHt2KT'; // Updated merchant address
+
 interface CreateOrderParams {
   items: CartItem[];
   subtotal: number;
@@ -53,13 +55,13 @@ export const createOrder = async ({
     throw new Error('Failed to create order items');
   }
 
-  // Create payment request
+  // Create payment request with updated merchant wallet address
   const { data: paymentRequest, error: paymentError } = await supabase
     .from('payment_requests')
     .insert({
       order_id: order.id,
       amount: total,
-      wallet_address: 'TTLxUTKUeqYJzE48CCPmJ2tESrnfrTW8XK', // Merchant wallet address
+      wallet_address: MERCHANT_ADDRESS, // Updated merchant wallet address
       status: 'pending'
     })
     .select()

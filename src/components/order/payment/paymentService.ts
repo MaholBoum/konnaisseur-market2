@@ -1,7 +1,7 @@
 import { TronWindow } from '@/components/wallet/types';
 
 const USDT_CONTRACT_ADDRESS = 'TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj';
-const MERCHANT_ADDRESS = 'TTLxUTKUeqYJzE48CCPmJ2tESrnfrTW8XK';
+const MERCHANT_ADDRESS = 'TVunEifCFGSS6MCiRzB3X3CyAMGJnHt2KT'; // Updated merchant address
 
 export const processPaymentTransaction = async (total: number) => {
   const tronWindow = window as TronWindow;
