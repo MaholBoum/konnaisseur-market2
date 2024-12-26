@@ -26,7 +26,7 @@ export const createPayment = async (amount: number, orderId: string): Promise<Cr
     const response = await fetch(`${CRYPTO_PAY_API_URL}/createInvoice`, {
       method: 'POST',
       headers: {
-        'Crypto-Pay-API-Token': process.env.CRYPTO_PAY_TOKEN || '',
+        'Crypto-Pay-API-Token': '313364:AAiLXFumujTRlso53c3TMw3MV3aq5S5a5Pr',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -65,7 +65,7 @@ export const checkPaymentStatus = async (invoiceId: string): Promise<boolean> =>
     const response = await fetch(`${CRYPTO_PAY_API_URL}/getInvoice`, {
       method: 'POST',
       headers: {
-        'Crypto-Pay-API-Token': process.env.CRYPTO_PAY_TOKEN || '',
+        'Crypto-Pay-API-Token': '313364:AAiLXFumujTRlso53c3TMw3MV3aq5S5a5Pr',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
