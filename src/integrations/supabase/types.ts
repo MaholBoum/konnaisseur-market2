@@ -111,36 +111,80 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_request_errors: {
+        Row: {
+          created_at: string | null
+          error_message: string
+          error_time: string | null
+          id: string
+          payment_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message: string
+          error_time?: string | null
+          id?: string
+          payment_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string
+          error_time?: string | null
+          id?: string
+          payment_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_request_errors_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payment_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_requests: {
         Row: {
           amount: number
+          confirmed_at: string | null
           created_at: string
+          expiry: string | null
           id: string
           order_id: string | null
+          retry_count: number | null
           status: string
           transaction_hash: string | null
           updated_at: string
           wallet_address: string
+          webhook_url: string | null
         }
         Insert: {
           amount: number
+          confirmed_at?: string | null
           created_at?: string
+          expiry?: string | null
           id?: string
           order_id?: string | null
+          retry_count?: number | null
           status?: string
           transaction_hash?: string | null
           updated_at?: string
           wallet_address: string
+          webhook_url?: string | null
         }
         Update: {
           amount?: number
+          confirmed_at?: string | null
           created_at?: string
+          expiry?: string | null
           id?: string
           order_id?: string | null
+          retry_count?: number | null
           status?: string
           transaction_hash?: string | null
           updated_at?: string
           wallet_address?: string
+          webhook_url?: string | null
         }
         Relationships: [
           {
@@ -217,6 +261,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      webhook_failures: {
+        Row: {
+          created_at: string | null
+          error_message: string
+          failure_time: string | null
+          id: string
+          payment_id: string | null
+          webhook_url: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_message: string
+          failure_time?: string | null
+          id?: string
+          payment_id?: string | null
+          webhook_url: string
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string
+          failure_time?: string | null
+          id?: string
+          payment_id?: string | null
+          webhook_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_failures_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payment_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
