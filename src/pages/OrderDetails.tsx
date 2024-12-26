@@ -23,7 +23,7 @@ export default function OrderDetails() {
     applyCoupon(couponInput);
   };
 
-  const { processPayment, isProcessing } = usePaymentProcessor({
+  const { processPayment, isProcessing, paymentRequest } = usePaymentProcessor({
     items,
     subtotal,
     discountAmount,
@@ -68,6 +68,7 @@ export default function OrderDetails() {
         total={total}
         isProcessing={isProcessing}
         onPayment={processPayment}
+        paymentRequest={paymentRequest}
       />
     </div>
   );

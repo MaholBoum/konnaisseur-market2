@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { CartItem } from '@/types/product';
 import { createOrder } from './orderService';
-import { processPaymentTransaction } from './paymentService';
 
 interface UsePaymentProcessorProps {
   items: CartItem[];
@@ -25,6 +23,7 @@ export const usePaymentProcessor = ({
   onSuccess
 }: UsePaymentProcessorProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentRequest, setPaymentRequest] = useState<any>(null);
   const { toast } = useToast();
 
   const processPayment = async () => {
@@ -40,23 +39,21 @@ export const usePaymentProcessor = ({
     try {
       setIsProcessing(true);
       
-      const transaction = await processPaymentTransaction(total);
-      await createOrder({
+      const { paymentRequest: newPaymentRequest } = await createOrder({
         items,
         subtotal,
         discountAmount,
         total,
         phoneNumber,
         couponCode,
-        transactionHash: transaction
-      });
-      
-      toast({
-        title: "Success",
-        description: "Payment processed successfully!",
       });
 
-      onSuccess();
+      setPaymentRequest(newPaymentRequest);
+      
+      toast({
+        title: "Order Created",
+        description: "Please send the exact amount of USDT to the provided wallet address.",
+      });
       
     } catch (error: any) {
       console.error('Payment error:', error);
@@ -70,5 +67,5 @@ export const usePaymentProcessor = ({
     }
   };
 
-  return { processPayment, isProcessing };
+  return { processPayment, isProcessing, paymentRequest };
 };
