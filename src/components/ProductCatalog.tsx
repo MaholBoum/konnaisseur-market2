@@ -61,8 +61,8 @@ export function ProductCatalog() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <div className="flex justify-between items-center px-4 py-3 bg-white">
-        <h1 className="text-xl font-semibold">Konnaisseur Market</h1>
+      <div className="flex justify-center items-center px-4 py-3 bg-white">
+        <h1 className="text-xl font-semibold">KONNAISSEUR MARKET</h1>
       </div>
       
       <div className="grid grid-cols-2 gap-3 p-3 pb-24">
