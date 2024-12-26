@@ -1,6 +1,6 @@
-import { createWeb3Modal } from '@web3modal/wagmi/react'
+import { createWeb3Modal } from '@web3modal/wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { WagmiProvider } from 'wagmi'
+import { WagmiConfig } from 'wagmi'
 import { config, projectId } from '@/config/web3'
 
 const queryClient = new QueryClient()
@@ -13,10 +13,10 @@ createWeb3Modal({
 
 export function Web3Provider({ children }: { children: React.ReactNode }) {
   return (
-    <WagmiProvider config={config}>
+    <WagmiConfig config={config}>
       <QueryClientProvider client={queryClient}>
         {children}
       </QueryClientProvider>
-    </WagmiProvider>
+    </WagmiConfig>
   )
 }

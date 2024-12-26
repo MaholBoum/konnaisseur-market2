@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { useAccount, useBalance, useContractWrite } from 'wagmi';
+import { useWeb3Modal } from '@web3modal/wagmi';
+import { useAccount, useBalance, useWriteContract } from 'wagmi';
 import { parseUnits } from 'viem';
 
 const USDT_CONTRACT = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
@@ -19,23 +19,10 @@ export const PaymentButton = ({ total, isProcessing, onPayment }: PaymentButtonP
   const { address, isConnected } = useAccount();
   const { data: balance } = useBalance({
     address,
-    token: USDT_CONTRACT,
+    token: USDT_CONTRACT as `0x${string}`
   });
 
-  const { write: transferUSDT } = useContractWrite({
-    address: USDT_CONTRACT,
-    abi: [{
-      constant: false,
-      inputs: [
-        { name: '_to', type: 'address' },
-        { name: '_value', type: 'uint256' },
-      ],
-      name: 'transfer',
-      outputs: [{ name: '', type: 'bool' }],
-      type: 'function',
-    }],
-    functionName: 'transfer',
-  });
+  const { writeContract } = useWriteContract();
 
   const handlePayment = async () => {
     try {
@@ -55,8 +42,21 @@ export const PaymentButton = ({ total, isProcessing, onPayment }: PaymentButtonP
 
       console.log('Starting USDT transfer...', { total, address });
 
-      transferUSDT({
-        args: [MERCHANT_ADDRESS, parseUnits(total.toString(), 6)],
+      writeContract({
+        address: USDT_CONTRACT as `0x${string}`,
+        abi: [{
+          inputs: [
+            { name: '_to', type: 'address' },
+            { name: '_value', type: 'uint256' },
+          ],
+          name: 'transfer',
+          outputs: [{ name: '', type: 'bool' }],
+          stateMutability: 'nonpayable',
+          type: 'function',
+        }],
+        functionName: 'transfer',
+        args: [MERCHANT_ADDRESS as `0x${string}`, parseUnits(total.toString(), 6)],
+      }, {
         onSuccess: async () => {
           console.log('USDT transfer successful');
           await onPayment();

@@ -1,6 +1,6 @@
-import { defaultWagmiConfig } from '@web3modal/wagmi/react/config'
-import { cookieStorage, createStorage } from 'wagmi'
-import { mainnet } from 'wagmi/chains'
+import { defaultWagmiConfig } from '@web3modal/wagmi'
+import { http } from 'viem'
+import { mainnet } from 'viem/chains'
 
 export const projectId = 'YOUR_WALLET_CONNECT_PROJECT_ID'
 
@@ -12,11 +12,10 @@ const metadata = {
 }
 
 export const config = defaultWagmiConfig({
-  chains: [mainnet], 
+  chains: [mainnet],
   projectId,
   metadata,
-  ssr: true,
-  storage: createStorage({
-    storage: cookieStorage
-  }),
+  transports: {
+    [mainnet.id]: http()
+  }
 })
