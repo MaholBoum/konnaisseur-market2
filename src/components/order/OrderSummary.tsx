@@ -78,7 +78,7 @@ export const OrderSummary = ({
                 {item.name} x{item.quantity}
               </span>
             </div>
-            <span>{item.price.toFixed(2)} USDT</span>
+            <span>${item.price.toFixed(2)}</span>
           </div>
         ))}
         
@@ -93,14 +93,14 @@ export const OrderSummary = ({
         {discount > 0 && (
           <div className="flex justify-between items-center text-green-600">
             <span>Discount</span>
-            <span>-{discountAmount.toFixed(2)} USDT</span>
+            <span>-${discountAmount.toFixed(2)}</span>
           </div>
         )}
 
         <div className="pt-4 border-t">
           <div className="flex justify-between items-center">
             <span className="text-xl font-bold">Total</span>
-            <span className="text-xl font-bold">{total.toFixed(2)} USDT</span>
+            <span className="text-xl font-bold">${total.toFixed(2)}</span>
           </div>
         </div>
       </div>
