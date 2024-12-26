@@ -22,19 +22,28 @@ export const PaymentButton = ({ total, isProcessing, onPayment, orderId }: Payme
       return;
     }
 
-    console.log('Initiating Crypto Pay payment...', { total, orderId });
-    
-    const response = await createPayment(total, orderId);
-    
-    if (response.success && response.paymentUrl) {
-      console.log('Payment URL generated:', response.paymentUrl);
-      window.open(response.paymentUrl, '_blank');
-      await onPayment();
-    } else {
-      console.error('Payment creation failed:', response.error);
+    try {
+      console.log('Initiating Crypto Pay payment...', { total, orderId });
+      
+      const response = await createPayment(total, orderId);
+      
+      if (response.success && response.paymentUrl) {
+        console.log('Payment URL generated:', response.paymentUrl);
+        window.open(response.paymentUrl, '_blank');
+        await onPayment();
+      } else {
+        console.error('Payment creation failed:', response.error);
+        toast({
+          title: "Payment Error",
+          description: response.error || "Failed to create payment",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Payment process error:', error);
       toast({
         title: "Payment Error",
-        description: response.error || "Failed to create payment",
+        description: "An unexpected error occurred while processing payment",
         variant: "destructive",
       });
     }
