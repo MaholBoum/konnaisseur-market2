@@ -1,7 +1,27 @@
 import { supabase } from '@/integrations/supabase/client';
 import { CartItem } from '@/types/product';
 
-const MERCHANT_ADDRESS = 'TTLxUTKUeqYJzE48CCPmJ2tESrnfrTW8XK';
+async function getMerchantAddress() {
+  console.log('Fetching merchant address from app_config...');
+  const { data, error } = await supabase
+    .from('app_config')
+    .select('value')
+    .eq('key', 'merchant_address')
+    .single();
+
+  if (error) {
+    console.error('Error fetching merchant address:', error);
+    throw new Error('Failed to fetch merchant address');
+  }
+
+  if (!data) {
+    console.error('No merchant address found in app_config');
+    throw new Error('Merchant address not configured');
+  }
+
+  console.log('Merchant address fetched successfully:', data.value);
+  return data.value;
+}
 
 interface CreateOrderParams {
   items: CartItem[];
@@ -83,6 +103,9 @@ export const createOrder = async ({
 
     console.log('Order items created successfully');
 
+    // Fetch merchant address
+    const merchantAddress = await getMerchantAddress();
+
     // Create payment request
     console.log('Creating payment request...');
     const { data: paymentRequest, error: paymentError } = await supabase
@@ -90,7 +113,7 @@ export const createOrder = async ({
       .insert([{
         order_id: order.id,
         amount: total,
-        wallet_address: MERCHANT_ADDRESS,
+        wallet_address: merchantAddress,
         status: 'pending',
         expiry: new Date(Date.now() + 60 * 60 * 1000).toISOString() // 1 hour expiry
       }])
