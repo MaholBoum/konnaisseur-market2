@@ -6,7 +6,7 @@ import { OrderSummary } from '@/components/order/OrderSummary';
 import { PaymentButton } from '@/components/order/PaymentButton';
 import { CouponInput } from '@/components/order/CouponInput';
 import { PhoneInput } from '@/components/order/PhoneInput';
-import { usePaymentProcessor } from '@/components/order/PaymentProcessor';
+import { usePaymentProcessor } from '@/components/order/payment/usePaymentProcessor';
 
 export default function OrderDetails() {
   const { items, applyCoupon, couponCode, discount, clearCart } = useCart();
