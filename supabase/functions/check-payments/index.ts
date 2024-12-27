@@ -19,6 +19,12 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Check if CRYPTO_PAY_TOKEN is configured
+    if (!CRYPTO_PAY_TOKEN) {
+      console.error('CRYPTO_PAY_TOKEN is not configured');
+      throw new Error('Crypto payment service is not configured properly');
+    }
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     
     // Fetch pending payment requests that haven't expired
@@ -49,8 +55,10 @@ const handler = async (req: Request): Promise<Response> => {
       console.log(`Checking payment ${payment.id}...`);
       
       try {
-        // Here you would typically check with your crypto payment provider
-        // For now, we'll just increment the retry count
+        // Here you would typically check with your crypto payment provider using CRYPTO_PAY_TOKEN
+        // For now, we'll just increment the retry count and log the attempt
+        console.log(`Would check payment with CRYPTO_PAY_TOKEN: ${CRYPTO_PAY_TOKEN?.substring(0, 4)}...`);
+        
         const { error: updateError } = await supabase
           .from('payment_requests')
           .update({
