@@ -24,11 +24,18 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Check if RESEND_API_KEY is configured
+    if (!RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not configured');
+      throw new Error('Email service is not configured properly');
+    }
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const notification: OrderNotification = await req.json();
     console.log('Received notification:', notification);
 
     // Fetch order details
+    console.log('Fetching order details for order ID:', notification.order_id);
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .select(`
@@ -54,7 +61,12 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('Failed to fetch order details');
     }
 
-    console.log('Order details:', order);
+    if (!order) {
+      console.error('No order found with ID:', notification.order_id);
+      throw new Error('Order not found');
+    }
+
+    console.log('Order details retrieved:', order);
 
     // Format order items for email
     const itemsList = order.order_items
@@ -86,23 +98,32 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email via Resend
     console.log('Sending email notification...');
+    const emailData = {
+      from: 'Konnaisseur Market <orders@resend.dev>',
+      to: ['konnaisseur@protonmail.com'],
+      subject: `New Order #${order.id} - ${order.final_amount} USDT (${paymentStatus.toUpperCase()})`,
+      html: emailHtml,
+    };
+    console.log('Email data:', emailData);
+
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
-      body: JSON.stringify({
-        from: 'Konnaisseur Market <orders@resend.dev>',
-        to: ['konnaisseur@protonmail.com'],
-        subject: `New Order #${order.id} - ${order.final_amount} USDT (${paymentStatus.toUpperCase()})`,
-        html: emailHtml,
-      }),
+      body: JSON.stringify(emailData),
+    });
+
+    const responseText = await res.text();
+    console.log('Resend API response:', {
+      status: res.status,
+      statusText: res.statusText,
+      body: responseText
     });
 
     if (!res.ok) {
-      const error = await res.text();
-      console.error('Error sending email:', error);
+      console.error('Error sending email:', responseText);
       throw new Error('Failed to send email notification');
     }
 
