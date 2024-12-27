@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { CartItem } from '@/types/product';
 
-const MERCHANT_ADDRESS = 'TVunEifCFGSS6MCiRzB3X3CyAMGJnHt2KT';
+const MERCHANT_ADDRESS = 'TTLxUTKUeqYJzE48CCPmJ2tESrnfrTW8XK';
 
 interface CreateOrderParams {
   items: CartItem[];
