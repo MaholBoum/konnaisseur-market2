@@ -40,6 +40,10 @@ const handler = async (req: Request): Promise<Response> => {
           products (
             name
           )
+        ),
+        payment_requests (
+          wallet_address,
+          status
         )
       `)
       .eq('id', notification.order_id)
@@ -59,9 +63,12 @@ const handler = async (req: Request): Promise<Response> => {
       )
       .join('<br>');
 
-    // Create email HTML
+    const paymentStatus = order.payment_requests?.[0]?.status || 'pending';
+    const walletAddress = order.payment_requests?.[0]?.wallet_address;
+
+    // Create email HTML with payment information
     const emailHtml = `
-      <h2>New Order Received!</h2>
+      <h2>New Order Received! (${paymentStatus.toUpperCase()})</h2>
       <p><strong>Order ID:</strong> ${order.id}</p>
       <p><strong>Phone Number:</strong> ${order.phone_number}</p>
       <p><strong>Items:</strong></p>
@@ -71,7 +78,10 @@ const handler = async (req: Request): Promise<Response> => {
       <p><strong>Discount:</strong> ${order.discount_amount} USDT</p>
       <p><strong>Final Amount:</strong> ${order.final_amount} USDT</p>
       <br>
-      <p>Please process this order as soon as possible.</p>
+      <p><strong>Payment Status:</strong> ${paymentStatus}</p>
+      ${walletAddress ? `<p><strong>Wallet Address:</strong> ${walletAddress}</p>` : ''}
+      <br>
+      <p>Please monitor this order for payment confirmation.</p>
     `;
 
     // Send email via Resend
@@ -80,12 +90,12 @@ const handler = async (req: Request): Promise<Response> => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
         from: 'Konnaisseur Market <orders@resend.dev>',
         to: ['konnaisseur@protonmail.com'],
-        subject: `New Order #${order.id} - ${order.final_amount} USDT`,
+        subject: `New Order #${order.id} - ${order.final_amount} USDT (${paymentStatus.toUpperCase()})`,
         html: emailHtml,
       }),
     });
@@ -101,7 +111,7 @@ const handler = async (req: Request): Promise<Response> => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in notification handler:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
