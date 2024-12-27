@@ -39,20 +39,24 @@ export const createOrder = async ({
     console.log('Creating order record...');
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .insert({
+      .insert([{
         total_amount: subtotal,
         discount_amount: discountAmount,
         final_amount: total,
         coupon_code: couponCode,
         phone_number: phoneNumber,
         status: 'pending'
-      })
-      .select()
+      }])
+      .select('*')
       .single();
 
     if (orderError) {
       console.error('Error creating order:', orderError);
       throw new Error('Failed to create order: ' + orderError.message);
+    }
+
+    if (!order) {
+      throw new Error('Order was not created');
     }
 
     console.log('Order created successfully:', order);
@@ -69,7 +73,8 @@ export const createOrder = async ({
 
     const { error: itemsError } = await supabase
       .from('order_items')
-      .insert(orderItems);
+      .insert(orderItems)
+      .select();
 
     if (itemsError) {
       console.error('Error creating order items:', itemsError);
@@ -82,19 +87,23 @@ export const createOrder = async ({
     console.log('Creating payment request...');
     const { data: paymentRequest, error: paymentError } = await supabase
       .from('payment_requests')
-      .insert({
+      .insert([{
         order_id: order.id,
         amount: total,
         wallet_address: MERCHANT_ADDRESS,
         status: 'pending',
         expiry: new Date(Date.now() + 60 * 60 * 1000).toISOString() // 1 hour expiry
-      })
-      .select()
+      }])
+      .select('*')
       .single();
 
     if (paymentError) {
       console.error('Error creating payment request:', paymentError);
       throw new Error('Failed to create payment request: ' + paymentError.message);
+    }
+
+    if (!paymentRequest) {
+      throw new Error('Payment request was not created');
     }
 
     console.log('Payment request created successfully:', paymentRequest);
