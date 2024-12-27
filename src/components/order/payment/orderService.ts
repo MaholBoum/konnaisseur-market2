@@ -47,7 +47,7 @@ export const createOrder = async ({
         phone_number: phoneNumber,
         status: 'pending'
       }])
-      .select('*')
+      .select()
       .single();
 
     if (orderError) {
@@ -56,6 +56,7 @@ export const createOrder = async ({
     }
 
     if (!order) {
+      console.error('Order was not created (no data returned)');
       throw new Error('Order was not created');
     }
 
@@ -73,8 +74,7 @@ export const createOrder = async ({
 
     const { error: itemsError } = await supabase
       .from('order_items')
-      .insert(orderItems)
-      .select();
+      .insert(orderItems);
 
     if (itemsError) {
       console.error('Error creating order items:', itemsError);
@@ -94,7 +94,7 @@ export const createOrder = async ({
         status: 'pending',
         expiry: new Date(Date.now() + 60 * 60 * 1000).toISOString() // 1 hour expiry
       }])
-      .select('*')
+      .select()
       .single();
 
     if (paymentError) {
@@ -103,6 +103,7 @@ export const createOrder = async ({
     }
 
     if (!paymentRequest) {
+      console.error('Payment request was not created (no data returned)');
       throw new Error('Payment request was not created');
     }
 
