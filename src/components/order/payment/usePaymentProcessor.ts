@@ -27,6 +27,15 @@ export const usePaymentProcessor = ({
   const { toast } = useToast();
 
   const processPayment = async () => {
+    console.log('Starting payment process with:', {
+      items,
+      subtotal,
+      discountAmount,
+      total,
+      phoneNumber,
+      couponCode
+    });
+
     if (!phoneNumber.trim()) {
       toast({
         title: "Error",
@@ -36,9 +45,18 @@ export const usePaymentProcessor = ({
       return;
     }
 
+    if (items.length === 0) {
+      toast({
+        title: "Error",
+        description: "Your cart is empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsProcessing(true);
-      console.log('Creating order with items:', items);
+      console.log('Creating order and payment request...');
       
       const { order, paymentRequest: newPaymentRequest } = await createOrder({
         items,
@@ -60,7 +78,7 @@ export const usePaymentProcessor = ({
       });
       
     } catch (error: any) {
-      console.error('Payment error:', error);
+      console.error('Payment processing error:', error);
       toast({
         title: "Error",
         description: error.message || "Payment failed. Please try again.",
