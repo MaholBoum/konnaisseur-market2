@@ -71,6 +71,7 @@ export const PaymentButton = ({
               <p className="text-sm text-gray-600">Send exactly</p>
               <p className="text-lg font-bold">{total.toFixed(2)} USDT</p>
               <p className="text-xs text-gray-500 break-all">{paymentRequest.wallet_address}</p>
+              <p className="text-xs text-gray-500">Network: Tron (Mainnet)</p>
             </div>
             <Button variant="outline" size="icon" onClick={copyAddress}>
               <Copy className="h-4 w-4" />
@@ -79,7 +80,7 @@ export const PaymentButton = ({
 
           <div className="flex justify-center p-4 bg-white rounded-lg">
             <QRCodeSVG
-              value={`tron:${paymentRequest.wallet_address}?amount=${total}`}
+              value={`tron:${paymentRequest.wallet_address}?amount=${total}&contract=${paymentRequest.token_contract}`}
               size={200}
               level="H"
               includeMargin={true}

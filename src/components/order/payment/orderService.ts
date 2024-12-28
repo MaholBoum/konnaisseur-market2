@@ -106,8 +106,8 @@ export const createOrder = async ({
     // Fetch merchant address
     const merchantAddress = await getMerchantAddress();
 
-    // Create payment request
-    console.log('Creating payment request...');
+    // Create payment request with mainnet configuration
+    console.log('Creating payment request on Tron mainnet...');
     const { data: paymentRequest, error: paymentError } = await supabase
       .from('payment_requests')
       .insert([{
@@ -115,7 +115,9 @@ export const createOrder = async ({
         amount: total,
         wallet_address: merchantAddress,
         status: 'pending',
-        expiry: new Date(Date.now() + 60 * 60 * 1000).toISOString() // 1 hour expiry
+        expiry: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour expiry
+        network: 'mainnet', // Explicitly specify mainnet
+        token_contract: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' // USDT contract address on Tron mainnet
       }])
       .select()
       .single();
