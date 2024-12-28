@@ -116,7 +116,7 @@ export const createOrder = async ({
         wallet_address: merchantAddress,
         status: 'pending',
         expiry: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour expiry
-        network: 'mainnet', // Explicitly specify mainnet
+        network: 'mainnet',
         token_contract: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' // USDT contract address on Tron mainnet
       }])
       .select()
