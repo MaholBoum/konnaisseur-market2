@@ -12,7 +12,7 @@ export default function OrderDetails() {
   const { items, applyCoupon, couponCode, discount, clearCart } = useCart();
   const navigate = useNavigate();
   const [couponInput, setCouponInput] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [telegramUsername, setTelegramUsername] = useState('');
   
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const discountAmount = discount * subtotal;
@@ -28,7 +28,7 @@ export default function OrderDetails() {
     subtotal,
     discountAmount,
     total,
-    phoneNumber,
+    telegramUsername,
     couponCode,
     onSuccess: () => {
       clearCart();
@@ -58,8 +58,8 @@ export default function OrderDetails() {
           />
 
           <PhoneInput
-            phoneNumber={phoneNumber}
-            onPhoneChange={setPhoneNumber}
+            username={telegramUsername}
+            onUsernameChange={setTelegramUsername}
           />
         </div>
       </div>

@@ -36,7 +36,7 @@ export const usePaymentProcessor = ({
       couponCode
     });
 
-    if (!telegramUsername.trim()) {
+    if (!telegramUsername?.trim()) {
       toast({
         title: "Error",
         description: "Please enter your Telegram username for delivery coordination",

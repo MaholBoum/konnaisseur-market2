@@ -1,10 +1,15 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+import { Json } from './json';
+import {
+  AppConfigTable,
+  CouponsTable,
+  OrderItemsTable,
+  OrdersTable,
+  PaymentRequestErrorsTable,
+  PaymentRequestsTable,
+  ProductCouponsTable,
+  ProductsTable,
+  WebhookFailuresTable
+} from './tables';
 
 export type Database = {
   public: {
