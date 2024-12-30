@@ -8,7 +8,7 @@ interface UsePaymentProcessorProps {
   subtotal: number;
   discountAmount: number;
   total: number;
-  phoneNumber: string;
+  telegramUsername: string;
   couponCode: string | null;
   onSuccess: () => void;
 }
@@ -18,7 +18,7 @@ export const usePaymentProcessor = ({
   subtotal,
   discountAmount,
   total,
-  phoneNumber,
+  telegramUsername,
   couponCode,
   onSuccess
 }: UsePaymentProcessorProps) => {
@@ -32,14 +32,14 @@ export const usePaymentProcessor = ({
       subtotal,
       discountAmount,
       total,
-      phoneNumber,
+      telegramUsername,
       couponCode
     });
 
-    if (!phoneNumber.trim()) {
+    if (!telegramUsername.trim()) {
       toast({
         title: "Error",
-        description: "Please enter your phone number for delivery coordination",
+        description: "Please enter your Telegram username for delivery coordination",
         variant: "destructive",
       });
       return;
@@ -63,7 +63,7 @@ export const usePaymentProcessor = ({
         subtotal,
         discountAmount,
         total,
-        phoneNumber,
+        telegramUsername,
         couponCode,
       });
 

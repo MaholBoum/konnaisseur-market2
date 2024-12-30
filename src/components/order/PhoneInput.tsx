@@ -1,22 +1,22 @@
 import { Input } from '@/components/ui/input';
 
-interface PhoneInputProps {
-  phoneNumber: string;
-  onPhoneChange: (value: string) => void;
+interface TelegramInputProps {
+  username: string;
+  onUsernameChange: (value: string) => void;
 }
 
-export const PhoneInput = ({ phoneNumber, onPhoneChange }: PhoneInputProps) => {
+export const PhoneInput = ({ username, onUsernameChange }: TelegramInputProps) => {
   return (
     <div className="space-y-2">
       <Input
-        type="tel"
-        placeholder="Enter your phone number"
-        value={phoneNumber}
-        onChange={(e) => onPhoneChange(e.target.value)}
+        type="text"
+        placeholder="Enter your Telegram username"
+        value={username}
+        onChange={(e) => onUsernameChange(e.target.value)}
         className="mb-2"
       />
       <p className="text-sm text-gray-500 italic">
-        Enter phone number to be called by an independent mailman
+        Enter your Telegram username someone will get in touch after payment confirmation
       </p>
     </div>
   );

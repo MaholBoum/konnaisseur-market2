@@ -28,7 +28,7 @@ interface CreateOrderParams {
   subtotal: number;
   discountAmount: number;
   total: number;
-  phoneNumber: string;
+  telegramUsername: string;
   couponCode: string | null;
 }
 
@@ -37,7 +37,7 @@ export const createOrder = async ({
   subtotal,
   discountAmount,
   total,
-  phoneNumber,
+  telegramUsername,
   couponCode,
 }: CreateOrderParams) => {
   console.log('Creating order with params:', {
@@ -45,7 +45,7 @@ export const createOrder = async ({
     subtotal,
     discountAmount,
     total,
-    phoneNumber,
+    telegramUsername,
     couponCode,
   });
 
@@ -64,7 +64,7 @@ export const createOrder = async ({
         discount_amount: discountAmount,
         final_amount: total,
         coupon_code: couponCode,
-        phone_number: phoneNumber,
+        phone_number: telegramUsername, // We'll reuse the phone_number column for telegram
         status: 'pending'
       }])
       .select()

@@ -12,7 +12,7 @@ export function Cart() {
   const { items, removeItem, updateQuantity, applyCoupon, couponCode, discount, clearCart } = useCart();
   const [couponInput, setCouponInput] = useState('');
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [telegramUsername, setTelegramUsername] = useState('');
   const { toast } = useToast();
 
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -24,7 +24,7 @@ export function Cart() {
     subtotal,
     discountAmount,
     total,
-    phoneNumber,
+    telegramUsername,
     couponCode,
     onSuccess: () => {
       clearCart();
@@ -84,16 +84,16 @@ export function Cart() {
             />
 
             <div className="space-y-2">
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                Phone Number (for delivery)
+              <label htmlFor="telegram" className="block text-sm font-medium text-gray-700">
+                Telegram Username
               </label>
               <input
-                type="tel"
-                id="phone"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                type="text"
+                id="telegram"
+                value={telegramUsername}
+                onChange={(e) => setTelegramUsername(e.target.value)}
                 className="w-full p-2 border rounded-md"
-                placeholder="Enter your phone number"
+                placeholder="Enter your Telegram username"
               />
             </div>
 

@@ -9,7 +9,7 @@ interface OrderSummaryProps {
   discountAmount: number;
   total: number;
   orderId: number;
-  phoneNumber?: string;
+  telegramUsername?: string;
 }
 
 export const OrderSummary = ({ 
@@ -19,19 +19,19 @@ export const OrderSummary = ({
   discountAmount, 
   total, 
   orderId,
-  phoneNumber
+  telegramUsername
 }: OrderSummaryProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (phoneNumber) {
+    if (telegramUsername) {
       toast({
         title: "Order Placed Successfully! 🎉",
-        description: "Thank you for your order! Our team will call you shortly at " + phoneNumber + " to confirm delivery details.",
+        description: "Thank you for your order! Our team will contact you on Telegram at @" + telegramUsername + " to confirm delivery details.",
         duration: 6000,
       });
     }
-  }, [phoneNumber, toast]);
+  }, [telegramUsername, toast]);
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-sm m-4">
