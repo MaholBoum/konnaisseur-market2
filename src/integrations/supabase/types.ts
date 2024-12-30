@@ -106,8 +106,8 @@ export type Database = {
           discount_amount: number | null
           final_amount: number
           id: string
-          phone_number: string | null
           status: string
+          telegram_username: string | null
           total_amount: number
         }
         Insert: {
@@ -116,8 +116,8 @@ export type Database = {
           discount_amount?: number | null
           final_amount: number
           id?: string
-          phone_number?: string | null
           status?: string
+          telegram_username?: string | null
           total_amount: number
         }
         Update: {
@@ -126,8 +126,8 @@ export type Database = {
           discount_amount?: number | null
           final_amount?: number
           id?: string
-          phone_number?: string | null
           status?: string
+          telegram_username?: string | null
           total_amount?: number
         }
         Relationships: []

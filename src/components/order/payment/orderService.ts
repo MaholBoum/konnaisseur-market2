@@ -64,7 +64,7 @@ export const createOrder = async ({
         discount_amount: discountAmount,
         final_amount: total,
         coupon_code: couponCode,
-        phone_number: telegramUsername, // We'll reuse the phone_number column for telegram
+        telegram_username: telegramUsername,
         status: 'pending'
       }])
       .select()

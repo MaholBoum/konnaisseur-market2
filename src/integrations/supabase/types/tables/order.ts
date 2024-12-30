@@ -7,7 +7,7 @@ export interface OrdersTable {
     final_amount: number
     status: string
     created_at: string
-    phone_number: string | null
+    telegram_username: string | null
   }
   Insert: {
     id?: string
@@ -17,7 +17,7 @@ export interface OrdersTable {
     final_amount: number
     status?: string
     created_at?: string
-    phone_number?: string | null
+    telegram_username?: string | null
   }
   Update: {
     id?: string
@@ -27,7 +27,7 @@ export interface OrdersTable {
     final_amount?: number
     status?: string
     created_at?: string
-    phone_number?: string | null
+    telegram_username?: string | null
   }
 }
 
